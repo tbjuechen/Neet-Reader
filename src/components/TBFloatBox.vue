@@ -1,0 +1,46 @@
+<template>
+  <Teleport to="body">
+    <div class="tb-float-box" :style="style">
+      <slot></slot>
+    </div>
+  </Teleport>
+</template>
+
+<script setup>
+
+import { Teleport,defineProps } from 'vue'
+
+const props=defineProps({
+    top_pos:{
+        type:String,
+        default:()=>'0'
+    },
+    left_pos:{
+        type:String,
+        default:()=>'0'
+    }
+})
+
+const style={
+    top:props.top_pos+'px',
+    left:props.left_pos+'px'
+}
+
+</script>
+
+<style scoped>
+
+.tb-float-box{
+    position: fixed;
+    z-index: 999;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    min-width: 20px;
+    min-height: 20px;
+    border-radius: 4px;
+    padding: 16px;
+    margin: 16px;
+    box-shadow: 0 0 50px -10px #888;
+}
+</style>

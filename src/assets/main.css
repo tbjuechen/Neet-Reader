@@ -1,0 +1,13 @@
+:root{
+    --bg-color: rgb(243,247,250);
+    --bd-line-color: rgb(32,148,255);
+    --bd-color-hover: rgb(68,164,254);
+    --bg-color-line: rgb(204,204,204);
+    --icon-color:rgb(120,120,120);
+    --icon-shadow-hover: rgb(229,229,229);
+}
+
+body{
+    margin: 0;
+}
+
