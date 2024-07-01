@@ -4,7 +4,7 @@
     <div id="left-sidebar"></div>
     <div id="main-container">
         bcd<br/>
-        <TBFloatBox top_pos='50' left_pos='50'/>
+        <!-- <TBFloatBox top_pos='50' left_pos='50'/> -->
     </div>
   </div>
 </template>

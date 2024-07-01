@@ -26,6 +26,8 @@ const style={
     left:props.left_pos+'px'
 }
 
+console.log(style)
+
 </script>
 
 <style scoped>
@@ -36,11 +38,7 @@ const style={
     background-color: white;
     border: 1px solid #ccc;
     z-index: 1000;
-    min-width: 20px;
-    min-height: 20px;
     border-radius: 4px;
-    padding: 16px;
-    margin: 16px;
     box-shadow: 0 0 50px -10px #888;
 }
 </style>
