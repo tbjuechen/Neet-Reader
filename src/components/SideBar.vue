@@ -130,6 +130,7 @@ const edit_panel_props = ref({
 const edit_panel_display = ref(false)
 
 const handleClickEdit = (e)=>{
+  distoryMenu();
   edit_panel_props.value.top_pos = (parseInt(item_menu_props.value.top_pos) - 6).toString();
   edit_panel_props.value.left_pos = (parseInt(item_menu_props.value.left_pos) - 6).toString();
   edit_panel_cpt.value = TBFloatBox;
