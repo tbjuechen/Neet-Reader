@@ -4,14 +4,14 @@
     <TBButton id="add-book-button" @click="()=>{console.log('2')}">添加图书</TBButton>
     <p id="book-shelf-name">书架</p>
     <SideBarItem
-      v-for="item in book_shelf_items" 
+      v-for="item,key in book_shelf_items" 
       :key="item.name" 
       :isSelect="item.isSelect"
       @click="handleSwich(item)"
     >
       <NoteIcon v-if="item.filled" :style="{width:'8px',height:'8px',marginRight:'12px',marginTop:'2px',stroke:item.color,fill:item.color}"/>
       <p class="item-text">{{item.name}}</p>
-      <MoreIcon v-if="item.filled" class="more-icon" @click="(e)=>handleClickMore(e,item)"/>
+      <MoreIcon v-if="item.filled" class="more-icon" @click="(e)=>handleClickMore(e,key)"/>
     </SideBarItem>
     <SideBarItem :isSelect="false"><AddIcon :style="{width:'8px',height:'8px',marginRight:'12px',marginTop:'2px'}"/><p>新建分类</p></SideBarItem>
     <TBDivider class="divider" direction="horizontal" style="width:176px"/>
@@ -20,9 +20,9 @@
     </SideBarItem>
     <TBDivider class="divider" direction="horizontal" style="width:176px"/>
   </div>
-  <component id="edit-del-memu" v-if="item_menu_display" :is="item_menu_cpt" v-bind="item_menu_props">
+  <component v-if="item_menu_display" :is="item_menu_cpt" v-bind="item_menu_props">
     <div class="drop-box">
-      <div class="drop-box-item">
+      <div class="drop-box-item" @click="handleClickEdit">
         <p class="drop-box-text">编辑</p>
       </div>
       <TBDivider direction="horizontal"/>
@@ -31,11 +31,18 @@
       </div>
     </div>
   </component>
+
+  <component v-if="edit_panel_display" :is="edit_panel_cpt" v-bind="edit_panel_props">
+    <div class="edit-panel" @click="(e)=>e.stopPropagation()">
+      <h4>编辑分类</h4>
+      <input type="text" placeholder="请输入分类名称"/>
+    </div>
+  </component>
 </template>
 
 <script setup>
 import LogoIcon from '@/assets/logo.svg';
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import TBButton from './TBButton.vue';
 import SideBarItem from './SideBarItem.vue';
 import NoteIcon from '@/assets/note.svg';
@@ -92,22 +99,52 @@ const item_menu_props = ref({
   left_pos:0
 })
 const item_menu_display = ref(false)
+let last_click_item = null;
 
 
-const handleClickMore = (e,item)=>{
-  item_menu_display.value = false
-  item_menu_cpt.value = null;
+const handleClickMore = (e, key)=>{
   const target = e.target.tagName === 'svg'?e.target:e.target.parentNode;
   const rect = target.getBoundingClientRect()
   let pos_x = rect.left + 0.5 * target.clientWidth;
   let pos_y = rect.top + 0.5 * target.clientHeight;
-  item_menu_props.value.top_pos = pos_y.toString();
-  item_menu_props.value.left_pos = (pos_x + 12).toString();
+  item_menu_props.value.top_pos = (pos_y + 12).toString();
+  item_menu_props.value.left_pos = (pos_x - 6).toString();
   item_menu_cpt.value = TBFloatBox;
+  last_click_item = key;
   item_menu_display.value = true
-  window.addEventListener('click',()=>{item_menu_display.value = false;item_menu_cpt.value = null})
+  window.addEventListener('click',distoryMenu)
   e.stopPropagation()
 }
+
+function distoryMenu(){
+  item_menu_display.value = false;
+  item_menu_cpt.value = null;
+  window.removeEventListener('click',distoryMenu)
+}
+
+const edit_panel_cpt = ref(null)
+const edit_panel_props = ref({
+  top_pos:0,
+  left_pos:0
+})
+const edit_panel_display = ref(false)
+
+const handleClickEdit = (e)=>{
+  edit_panel_props.value.top_pos = (parseInt(item_menu_props.value.top_pos) - 6).toString();
+  edit_panel_props.value.left_pos = (parseInt(item_menu_props.value.left_pos) - 6).toString();
+  edit_panel_cpt.value = TBFloatBox;
+  edit_panel_display.value = true;
+  window.addEventListener('click',distoryEditPanel)
+  e.stopPropagation()
+}
+
+function distoryEditPanel(){
+  edit_panel_display.value = false;
+  edit_panel_cpt.value = null;
+  window.removeEventListener('click',distoryEditPanel)
+}
+
+
 
 </script>
 
@@ -195,5 +232,12 @@ path{
 .drop-box-text{
   margin:0;
   font-size: 14px;
+}
+
+.edit-panel{
+  display: flex;
+  flex-direction: column;
+  padding: 2px 6px;
+  align-items: flex-start;
 }
 </style>
