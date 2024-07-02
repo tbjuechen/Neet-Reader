@@ -37,7 +37,7 @@
       <h4>编辑分类</h4>
       <TBInput type="text" placeholder="请输入分类名称"/>
       <div class="color-box">
-
+        <TBCheckBox v-for="item in color_list" :key="item.name" type="radio" name="color" :color="item.color"/>
       </div>
     </div>
   </component>
@@ -54,20 +54,21 @@ import TBDivider from './TBDivider.vue';
 import MoreIcon from '@/assets/more.svg';
 import TBFloatBox from './TBFloatBox.vue';
 import TBInput from './TBInput.vue';
+import TBCheckBox from './TBCheckBox.vue';
 
 const color_dict = {
-  'red': '#FF0000',
-  'green': '#00FF00',
-  'blue': '#0000FF',
-  'yellow': '#FFFF00',
-  'purple': '#800080',
-  'orange': '#FFA500',
+  'gray': 'rgb(158,158,158)',
+  'blue': 'rgb(61,168,245)',
+  'green': 'rgb(117,201,64)',
+  'purple': 'rgb(121,126,201)',
+  'orange': 'rgb(255,175,56)',
+  'red': 'rgb(255,79,62)',
 }
 
 const book_shelf_items = ref(
   [
     {name: '全部图书', filled: null},
-    {name: '分类一', filled: 'red'},
+    {name: '分类一', filled: 'gray'},
     {name: '分类二', filled: 'green'},
   ]
 )
@@ -143,7 +144,16 @@ function distoryEditPanel(){
   window.removeEventListener('click',distoryEditPanel)
 }
 
+const color_list = ref([])
 
+for (const key in color_dict) {
+    color_list.value.push({
+      name: key,
+      color: color_dict[key]
+    })
+};
+
+console.log(color_list)
 
 </script>
 
@@ -246,4 +256,12 @@ path{
 h4{
   margin:0; 
 }
+
+.color-box{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
 </style>
