@@ -1,7 +1,7 @@
 <template>
   <div id="sidebar">
     <LogoIcon class="icon-logo"/>
-    <TBButton id="add-book-button" @click="()=>{console.log('2')}">添加图书</TBButton>
+    <TBButton id="add-book-button"  @click="()=>{console.log('2')}">添加图书</TBButton>
     <p id="book-shelf-name">书架</p>
     <SideBarItem
       v-for="item,key in book_shelf_items" 
@@ -39,6 +39,7 @@
       <div class="color-box">
         <TBCheckBox v-for="item in color_list" :key="item.name" type="radio" name="color" :color="item.color"/>
       </div>
+      <TBButton id="confirm-button" :full="true"><p>确认</p></TBButton>
     </div>
   </component>
 </template>
@@ -102,6 +103,7 @@ let last_click_item = null;
 
 
 const handleClickMore = (e, key)=>{
+  distoryEditPanel();
   const target = e.target.tagName === 'svg'?e.target:e.target.parentNode;
   const rect = target.getBoundingClientRect()
   let pos_x = rect.left + 0.5 * target.clientWidth;
@@ -130,8 +132,8 @@ const edit_panel_display = ref(false)
 
 const handleClickEdit = (e)=>{
   distoryMenu();
-  edit_panel_props.value.top_pos = (parseInt(item_menu_props.value.top_pos) - 6).toString();
-  edit_panel_props.value.left_pos = (parseInt(item_menu_props.value.left_pos) - 6).toString();
+  edit_panel_props.value.top_pos = (parseInt(item_menu_props.value.top_pos) - 74).toString();
+  edit_panel_props.value.left_pos = (parseInt(item_menu_props.value.left_pos) + 14).toString();
   edit_panel_cpt.value = TBFloatBox;
   edit_panel_display.value = true;
   window.addEventListener('click',distoryEditPanel)
@@ -250,11 +252,14 @@ path{
   align-items: flex-start;
   /* gap: 8px; */
   justify-content: space-evenly;
-  height: 100px;
+  height: 128px;
 }
 
 h4{
   margin:0; 
+  color: rgb(51,51,51);
+  font-size: 14px;
+  user-select: none;
 }
 
 .color-box{
@@ -264,4 +269,12 @@ h4{
   width: 100%;
 }
 
+#confirm-button{
+  width: 60px;
+  height: 24px;
+}
+
+#confirm-button>p{
+  margin: 0;
+}
 </style>
