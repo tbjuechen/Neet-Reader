@@ -36,7 +36,7 @@ console.log(style)
     position: fixed;
     z-index: 999;
     background-color: white;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     z-index: 1000;
     border-radius: 4px;
     box-shadow: 0 0 50px -10px rgb(204,204,204);

@@ -35,7 +35,10 @@
   <component v-if="edit_panel_display" :is="edit_panel_cpt" v-bind="edit_panel_props">
     <div class="edit-panel" @click="(e)=>e.stopPropagation()">
       <h4>编辑分类</h4>
-      <input type="text" placeholder="请输入分类名称"/>
+      <TBInput type="text" placeholder="请输入分类名称"/>
+      <div class="color-box">
+
+      </div>
     </div>
   </component>
 </template>
@@ -50,6 +53,7 @@ import AddIcon from '@/assets/add.svg';
 import TBDivider from './TBDivider.vue';
 import MoreIcon from '@/assets/more.svg';
 import TBFloatBox from './TBFloatBox.vue';
+import TBInput from './TBInput.vue';
 
 const color_dict = {
   'red': '#FF0000',
@@ -58,12 +62,6 @@ const color_dict = {
   'yellow': '#FFFF00',
   'purple': '#800080',
   'orange': '#FFA500',
-  'black': '#000000',
-  'white': '#FFFFFF',
-  'gray': '#808080',
-  'brown': '#A52A2A',
-  'pink': '#FFC0CB',
-  'cyan': '#00FFFF',
 }
 
 const book_shelf_items = ref(
@@ -238,7 +236,14 @@ path{
 .edit-panel{
   display: flex;
   flex-direction: column;
-  padding: 2px 6px;
+  padding: 2px 12px;
   align-items: flex-start;
+  /* gap: 8px; */
+  justify-content: space-evenly;
+  height: 100px;
+}
+
+h4{
+  margin:0; 
 }
 </style>
