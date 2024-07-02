@@ -1,5 +1,12 @@
 <template>
-  <input type="checkbox" class="tb-check-box" :style="{'--box-color':props.color}"/>
+  <input 
+    type="checkbox" 
+    class="tb-check-box" 
+    :style="{'--box-color':props.color}" 
+    :value="value"
+    :checked="modelValue === value"
+    @change="$emit('update:modelValue', value)"
+  />
 </template>
 
 <script setup>
@@ -7,6 +14,14 @@
 const props = defineProps({
   color:{
     type:String,
+  },
+  value: {
+    type: [String, Number],
+    required: true
+  },
+  modelValue :{
+    type: [String, Number],
+    required: true
   }
 })
 

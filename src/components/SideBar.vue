@@ -35,11 +35,11 @@
   <component v-if="edit_panel_display" :is="edit_panel_cpt" v-bind="edit_panel_props">
     <div class="edit-panel" @click="(e)=>e.stopPropagation()">
       <h4>编辑分类</h4>
-      <TBInput type="text" placeholder="请输入分类名称"/>
+      <TBInput type="text" placeholder="请输入分类名称" v-model="item_name_text"/>
       <div class="color-box">
-        <TBCheckBox v-for="item in color_list" :key="item.name" type="radio" name="color" :color="item.color"/>
+        <TBCheckBox name="color" v-for="item,key in color_list" :key="item.name" type="radio" :color="item.color" :value="key" v-model="selected_color"/>
       </div>
-      <TBButton id="confirm-button" :full="true"><p>确认</p></TBButton>
+      <TBButton id="confirm-button" :full="true" @click="handleConfirmEdit()"><p>确认</p></TBButton>
     </div>
   </component>
 </template>
@@ -102,16 +102,19 @@ const item_menu_display = ref(false)
 let last_click_item = null;
 
 
+const selected_color = ref(null)  //被选中的颜色
+const item_name_text = ref(null)  //类别原名
+
 const handleClickMore = (e, key)=>{
   distoryEditPanel();
   const target = e.target.tagName === 'svg'?e.target:e.target.parentNode;
   const rect = target.getBoundingClientRect()
   let pos_x = rect.left + 0.5 * target.clientWidth;
   let pos_y = rect.top + 0.5 * target.clientHeight;
+  last_click_item = key;
   item_menu_props.value.top_pos = (pos_y + 12).toString();
   item_menu_props.value.left_pos = (pos_x - 6).toString();
   item_menu_cpt.value = TBFloatBox;
-  last_click_item = key;
   item_menu_display.value = true
   window.addEventListener('click',distoryMenu)
   e.stopPropagation()
@@ -132,6 +135,8 @@ const edit_panel_display = ref(false)
 
 const handleClickEdit = (e)=>{
   distoryMenu();
+  // 装载数据
+  item_name_text.value = book_shelf_items.value[last_click_item].name;
   edit_panel_props.value.top_pos = (parseInt(item_menu_props.value.top_pos) - 74).toString();
   edit_panel_props.value.left_pos = (parseInt(item_menu_props.value.left_pos) + 14).toString();
   edit_panel_cpt.value = TBFloatBox;
@@ -141,6 +146,7 @@ const handleClickEdit = (e)=>{
 }
 
 function distoryEditPanel(){
+  selected_color.value = null;
   edit_panel_display.value = false;
   edit_panel_cpt.value = null;
   window.removeEventListener('click',distoryEditPanel)
@@ -155,7 +161,22 @@ for (const key in color_dict) {
     })
 };
 
-console.log(color_list)
+const handleConfirmEdit = () => {
+  let flag = false;
+  // 判断内容是否发生改变
+  if (item_name_text.value !== book_shelf_items.value[last_click_item].name){
+    flag = true;
+    book_shelf_items.value[last_click_item].name = item_name_text.value
+  }
+  if (selected_color){
+    if (color_list.value[selected_color.value].name !== book_shelf_items.value[last_click_item].filled){
+      flag = true;
+      book_shelf_items.value[last_click_item].filled = color_list.value[selected_color.value].name;
+      book_shelf_items.value[last_click_item].color = color_list.value[selected_color.value].color;
+    }
+  }
+  // 和后端同步
+}
 
 </script>
 
