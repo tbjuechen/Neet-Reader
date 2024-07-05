@@ -42,6 +42,7 @@
       <TBButton id="confirm-button" :full="true" @click="handleConfirmEdit()"><p>确认</p></TBButton>
     </div>
   </component>
+  <TBDialog/>
 </template>
 
 <script setup>
@@ -56,6 +57,7 @@ import MoreIcon from '@/assets/more.svg';
 import TBFloatBox from './TBFloatBox.vue';
 import TBInput from './TBInput.vue';
 import TBCheckBox from './TBCheckBox.vue';
+import TBDialog from './TBDialog.vue';
 
 const color_dict = {
   'gray': 'rgb(158,158,158)',
@@ -146,10 +148,10 @@ const handleClickEdit = (e)=>{
 }
 
 function distoryEditPanel(){
-  selected_color.value = null;
   edit_panel_display.value = false;
   edit_panel_cpt.value = null;
   window.removeEventListener('click',distoryEditPanel)
+  selected_color.value = null;
 }
 
 const color_list = ref([])
@@ -176,6 +178,8 @@ const handleConfirmEdit = () => {
     }
   }
   // 和后端同步
+
+  distoryEditPanel();
 }
 
 </script>

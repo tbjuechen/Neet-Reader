@@ -31,7 +31,7 @@ const closeWindow = () => {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000; /* 确保在最顶层 */
+  z-index: 49; /* 确保在最顶层 */
   -webkit-app-region: drag;
   background-color: transparent; /* 设置透明背景 */
   height: 30px;
