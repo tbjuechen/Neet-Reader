@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div :class="{'tb-dialog':true,'quit':isQuit}" v-if="show">
+    <div :class="{'tb-dialog':true,'quit':isQuit}" v-if="show" :style="{'--top':props.y, '--left':props.x}">
       <span id="message">
         <WarningIcon id="message-icon"/>
         <p id="message-text">{{ props.message }}</p>
@@ -35,6 +35,14 @@ const props = defineProps({
   reject:{
     type:Function,
     default:()=>{()=>{}}
+  },
+  x:{
+    type:String,
+    default:()=>'0'
+  },
+  y:{
+    type:String,
+    default:()=>'0'
   }
 })
 
@@ -66,7 +74,7 @@ function removeComponent() {
   position: absolute;
   width: 400px;
   height: 160px;
-  animation: moveToCenter 0.6s cubic-bezier(0.5,0.2,0.5,1) forwards;
+  animation: moveToCenter 0.5s forwards;
   background: white;
   overflow: hidden;
   transform: translate(-50%, -50%);
@@ -81,8 +89,8 @@ function removeComponent() {
 @keyframes moveToCenter {
   0% {
     transform: translate(-50%, -50%) scale(0);
-    top: 0;
-    left: 0;
+    top: var(--top);
+    left: var(--left);
   }
   100% {
     transform: translate(-50%, -50%) scale(1);

@@ -26,7 +26,7 @@
         <p class="drop-box-text">编辑</p>
       </div>
       <TBDivider direction="horizontal"/>
-      <div class="drop-box-item">
+      <div class="drop-box-item" @click="(e)=>handleClickDelete(e)">
         <p class="drop-box-text">删除</p>
       </div>
     </div>
@@ -58,6 +58,7 @@ import TBFloatBox from './TBFloatBox.vue';
 import TBInput from './TBInput.vue';
 import TBCheckBox from './TBCheckBox.vue';
 import TBDialog from './TBDialog.vue';
+import openDialog from '@/core/dialog.js';
 
 const color_dict = {
   'gray': 'rgb(158,158,158)',
@@ -180,6 +181,24 @@ const handleConfirmEdit = () => {
   // 和后端同步
 
   distoryEditPanel();
+}
+
+const handleClickDelete = (e) => {
+  // // 删除分类
+  // book_shelf_items.value.splice(last_click_item,1);
+  distoryMenu();
+  const item = book_shelf_items.value[last_click_item];
+  const message = '确认删除分类“' + item.name + '”吗？';
+  const accept = () => {
+    // 删除分类
+    book_shelf_items.value.splice(last_click_item,1);
+  }
+  const reject = () => {}
+  // 获取点击位置
+  const x = e.clientX.toString() + 'px';
+  const y = e.clientY.toString() + 'px';
+  openDialog(message, reject, accept, x, y);
+
 }
 
 </script>
