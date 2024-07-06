@@ -1,21 +1,19 @@
 <template>
-  <div :class="{'selected': props.isSelect, 'sidebar-item': true}" >
+  <div :class="{'selected': props.isSelect, 'sidebar-item': true}" :ref="操了不让我用ref">
     <slot></slot>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
-
+import { defineProps, ref } from 'vue'
 
 const props = defineProps({
   isSelect: {
     type: Boolean,
     default: () => false
-  }
+  },
+  操了不让我用ref: null,
 })
-
-
 </script>
 
 <style scoped>

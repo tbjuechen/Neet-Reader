@@ -13,7 +13,7 @@
       <p class="item-text">{{item.name}}</p>
       <MoreIcon v-if="item.filled" class="more-icon" @click="(e)=>handleClickMore(e,key)"/>
     </SideBarItem>
-    <SideBarItem :isSelect="false"><AddIcon :style="{width:'8px',height:'8px',marginRight:'12px',marginTop:'2px'}"/><p>新建分类</p></SideBarItem>
+    <SideBarItem :操了不让我用ref="(el)=>{createRef = el}" :isSelect="false" @click="handleClickCreate"><AddIcon :style="{width:'8px',height:'8px',marginRight:'12px',marginTop:'2px'}"/><p>新建分类</p></SideBarItem>
     <TBDivider class="divider" direction="horizontal" style="width:176px"/>
     <SideBarItem :isSelect="cloud_item.isSelect" @click="handleSwich(cloud_item)">
       <p>{{cloud_item.name}}</p>
@@ -42,7 +42,17 @@
       <TBButton id="confirm-button" :full="true" @click="handleConfirmEdit()"><p>确认</p></TBButton>
     </div>
   </component>
-  <TBDialog/>
+
+  <component v-if="create_panel_display" :is="create_panel_cpt" v-bind="create_panel_props">
+    <div class="edit-panel" @click="(e)=>e.stopPropagation()">
+      <h4>新建分类</h4>
+      <TBInput type="text" placeholder="请输入分类名称" v-model="item_name_text"/>
+      <div class="color-box">
+        <TBCheckBox name="color" v-for="item,key in color_list" :key="item.name" type="radio" :color="item.color" :value="key" v-model="selected_color"/>
+      </div>
+      <TBButton id="confirm-button" :full="true" @click="handleConfirmEdit()"><p>确认</p></TBButton>
+    </div>
+  </component>
 </template>
 
 <script setup>
@@ -57,7 +67,6 @@ import MoreIcon from '@/assets/more.svg';
 import TBFloatBox from './TBFloatBox.vue';
 import TBInput from './TBInput.vue';
 import TBCheckBox from './TBCheckBox.vue';
-import TBDialog from './TBDialog.vue';
 import openDialog from '@/core/dialog.js';
 
 const color_dict = {
@@ -171,7 +180,8 @@ const handleConfirmEdit = () => {
     flag = true;
     book_shelf_items.value[last_click_item].name = item_name_text.value
   }
-  if (selected_color){
+  if (selected_color.value){
+    // debugger;
     if (color_list.value[selected_color.value].name !== book_shelf_items.value[last_click_item].filled){
       flag = true;
       book_shelf_items.value[last_click_item].filled = color_list.value[selected_color.value].name;
@@ -198,9 +208,34 @@ const handleClickDelete = (e) => {
   const x = e.clientX.toString() + 'px';
   const y = e.clientY.toString() + 'px';
   openDialog(message, reject, accept, x, y);
-
 }
 
+const create_panel_cpt = ref(null)
+const create_panel_props = ref({
+  top_pos:0,
+  left_pos:0
+})
+const create_panel_display = ref(false)
+
+const createRef = ref(null)
+
+const handleClickCreate = (e) => {
+  distoryMenu();
+  console.log(createRef.value)
+  const rect = createRef.value.getBoundingClientRect()
+  create_panel_props.value.top_pos = (parseInt(rect.top) - 74).toString();
+  create_panel_props.value.left_pos = (parseInt(rect.left) + 14).toString();
+  create_panel_cpt.value = TBFloatBox;
+  create_panel_display.value = true;
+  window.addEventListener('click',distoryCreatePanel)
+  e.stopPropagation()
+}
+
+const distoryCreatePanel = () => {
+  create_panel_display.value = false;
+  create_panel_cpt.value = null;
+  window.removeEventListener('click',distoryCreatePanel)
+}
 </script>
 
 
