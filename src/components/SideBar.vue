@@ -50,7 +50,7 @@
       <div class="color-box">
         <TBCheckBox name="color" v-for="item,key in color_list" :key="item.name" type="radio" :color="item.color" :value="key" v-model="selected_color"/>
       </div>
-      <TBButton id="confirm-button" :full="true" @click="handleConfirmEdit()"><p>确认</p></TBButton>
+      <TBButton id="confirm-button" :full="true" @click="handelConfirmCreate()"><p>确认</p></TBButton>
     </div>
   </component>
 </template>
@@ -115,7 +115,7 @@ let last_click_item = null;
 
 
 const selected_color = ref(null)  //被选中的颜色
-const item_name_text = ref(null)  //类别原名
+const item_name_text = ref('')  //类别原名
 
 const handleClickMore = (e, key)=>{
   distoryEditPanel();
@@ -223,10 +223,11 @@ const createRef = ref(null)
 
 const handleClickCreate = (e) => {
   distoryMenu();
-  console.log(createRef.value)
+  distoryEditPanel();
+  selected_color.value = 0
   const rect = createRef.value.getBoundingClientRect()
-  create_panel_props.value.top_pos = (parseInt(rect.top) - 74).toString();
-  create_panel_props.value.left_pos = (parseInt(rect.left) + 14).toString();
+  create_panel_props.value.top_pos = (parseInt(rect.top) - 50).toString();
+  create_panel_props.value.left_pos = (parseInt(rect.left) + 170).toString();
   create_panel_cpt.value = TBFloatBox;
   create_panel_display.value = true;
   window.addEventListener('click',distoryCreatePanel)
@@ -237,6 +238,17 @@ const distoryCreatePanel = () => {
   create_panel_display.value = false;
   create_panel_cpt.value = null;
   window.removeEventListener('click',distoryCreatePanel)
+}
+
+const handelConfirmCreate = () => {
+  const new_catalog = {
+    name: item_name_text.value,
+    filled: color_list.value[selected_color.value].name,
+    color: color_list.value[selected_color.value].color
+  }
+  console.log(new_catalog)
+  book_shelf_items.value.push(new_catalog)
+  distoryCreatePanel()
 }
 </script>
 
