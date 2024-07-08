@@ -149,6 +149,8 @@ const handleClickEdit = (e)=>{
   distoryMenu();
   // 装载数据
   item_name_text.value = book_shelf_items.value[last_click_item].name;
+  selected_color.value = color_list.value.findIndex(el => el.name == book_shelf_items.value[last_click_item].filled)
+  // console.log(selected_color.value)
   edit_panel_props.value.top_pos = (parseInt(item_menu_props.value.top_pos) - 74).toString();
   edit_panel_props.value.left_pos = (parseInt(item_menu_props.value.left_pos) + 14).toString();
   edit_panel_cpt.value = TBFloatBox;
@@ -180,7 +182,7 @@ const handleConfirmEdit = () => {
     flag = true;
     book_shelf_items.value[last_click_item].name = item_name_text.value
   }
-  if (selected_color.value){
+  if (selected_color.value !== null){
     // debugger;
     if (color_list.value[selected_color.value].name !== book_shelf_items.value[last_click_item].filled){
       flag = true;

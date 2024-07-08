@@ -26,7 +26,7 @@ const style={
     left:props.left_pos+'px'
 }
 
-console.log(style)
+// console.log(style)
 
 </script>
 
