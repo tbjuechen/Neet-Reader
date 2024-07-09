@@ -6,7 +6,7 @@
     </div>
     <div id="filter-box">
         <TBInput id="book-filter" style="box-sizing:border-box; width: 100%;" placeholder="输入书名，进行筛选"/>
-        <p id="sort">排序&nbsp;▼</p>
+        <p id="sort">排序<DownArrowIcon style="width: 12px; transform: translate(8px,3px); fill:rgb(198,198,198)"/></p>
     </div>
   </div>
 </template>
@@ -14,6 +14,7 @@
 <script setup>
 import {ref} from 'vue'
 import TBInput from '@/components/TBInput.vue';
+import DownArrowIcon from '@/assets/downArrow.svg'
 
 // 从后端获取
 const data = ref({
@@ -75,8 +76,9 @@ p{
 #sort{
     flex:56px;
     font-size: 12px;
-    text-align: "center";
-    color: rgb(102,102,102)
+    color: rgb(102,102,102);
+    user-select: none;
+    cursor: pointer;
 }
 
 </style>
