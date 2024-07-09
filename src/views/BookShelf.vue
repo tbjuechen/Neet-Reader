@@ -8,6 +8,9 @@
         <TBInput id="book-filter" style="box-sizing:border-box; width: 100%;" placeholder="输入书名，进行筛选"/>
         <p id="sort">排序<DownArrowIcon style="width: 12px; transform: translate(8px,3px); fill:rgb(198,198,198)"/></p>
     </div>
+    <div class="book-grid-box">
+        <BookCard book_id="-1"></BookCard>
+    </div>
   </div>
 </template>
 
@@ -15,6 +18,7 @@
 import {ref} from 'vue'
 import TBInput from '@/components/TBInput.vue';
 import DownArrowIcon from '@/assets/downArrow.svg'
+import BookCard from '@/components/BookCard.vue'
 
 // 从后端获取
 const data = ref({
