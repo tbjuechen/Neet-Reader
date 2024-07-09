@@ -1,11 +1,14 @@
 <template>
-  <div :class="{'selected': props.isSelect, 'sidebar-item': true}" :ref="操了不让我用ref">
+  <div :class="{'selected': props.isSelect, 'sidebar-item': true}" :ref="操了不让我用ref" @click="handleClickRoute">
     <slot></slot>
   </div>
 </template>
 
 <script setup>
 import { defineProps, ref } from 'vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 const props = defineProps({
   isSelect: {
@@ -13,7 +16,18 @@ const props = defineProps({
     default: () => false
   },
   操了不让我用ref: null,
+  to:{
+    type:  Object,
+    required: false
+  }
 })
+
+const handleClickRoute= () => {
+  if (props.to){
+    router.push(props.to)
+  }
+}
+
 </script>
 
 <style scoped>

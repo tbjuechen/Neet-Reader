@@ -6,7 +6,14 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../views/MainLayout.vue')
+      component: () => import('../views/MainLayout.vue'),
+      children:[
+        {
+          path:'/shelf/:id',
+          name:'shelf',
+          component: ()=> import('../views/BookShelf.vue')
+        }
+      ]
     },
   ]
 })

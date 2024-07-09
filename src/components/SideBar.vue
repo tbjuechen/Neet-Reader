@@ -7,6 +7,7 @@
       v-for="item,key in book_shelf_items" 
       :key="item.name" 
       :isSelect="item.isSelect"
+      :to="{name:'shelf', params:{id:key}}"
       @click="handleSwich(item)"
     >
       <NoteIcon v-if="item.filled" :style="{width:'8px',height:'8px',marginRight:'12px',marginTop:'2px',stroke:item.color,fill:item.color}"/>
@@ -119,6 +120,7 @@ const item_name_text = ref('')  //类别原名
 
 const handleClickMore = (e, key)=>{
   distoryEditPanel();
+  distoryCreatePanel();
   const target = e.target.tagName === 'svg'?e.target:e.target.parentNode;
   const rect = target.getBoundingClientRect()
   let pos_x = rect.left + 0.5 * target.clientWidth;
@@ -248,6 +250,7 @@ const handelConfirmCreate = () => {
   }
   console.log(new_catalog)
   book_shelf_items.value.push(new_catalog)
+  // 和后端同步
   distoryCreatePanel()
 }
 </script>
