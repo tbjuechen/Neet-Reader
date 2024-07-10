@@ -14,7 +14,7 @@ body{
 
 /* 定义滚动条宽度 */
 ::-webkit-scrollbar {
-    width: 5px; /* 对于垂直滚动条 */
+    width: 7px; /* 对于垂直滚动条 */
     height: 12px; /* 对于水平滚动条 */
   }
   
@@ -26,7 +26,7 @@ body{
   /* 滚动条滑块 */
   ::-webkit-scrollbar-thumb {
     background: rgb(144,144,144); 
-    border-radius: 2px;
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
