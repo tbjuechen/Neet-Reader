@@ -9,13 +9,13 @@
         <img :src="data.cover" class="book-cover">
         <input type="checkbox" class="book-slecet"/>
     </div>
+    <p class="book-title">{{ data.title }}</p>
   </div>
 </template>
 
 <script setup>
 
 import {ref} from 'vue'
-import TBCheckBox from './TBCheckBox.vue';
 
 const props = defineProps({
     book_id:{
@@ -39,7 +39,8 @@ const data = ref({
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap:10px;
+    gap:16px;
+    width: 156px;
 }
 
 .book-cover{
@@ -75,6 +76,10 @@ const data = ref({
     border:rgb(24,144,255) solid 2px;
 }
 
+.cover-box:hover .book-slecet{
+    opacity: 1;
+}
+
 .book-slecet{
     position: absolute;
     top:8px;
@@ -87,7 +92,8 @@ const data = ref({
     appearance:none;
     box-sizing:content-box;
     background: white;
-    transition: border 0.6s, background-color 0.2s ;
+    transition: border 0.6s, background-color 0.2s, opacity 0.2s;
+    opacity: 0;
 }
 
 .book-slecet:hover{
@@ -141,8 +147,20 @@ const data = ref({
         transform: translate(-0.5px,-16.5px) scale(1.5);
         border: rgba(24,144,255,0) 1px solid;
     }
-    
 }
 
+.book-title{
+    width: 100%;
+    display: -webkit-box; /* 必须结合 -webkit-box-orient 使用 */
+    -webkit-box-orient: vertical; /* 设置为垂直排列子元素 */
+    -webkit-line-clamp: 3; /* 限制显示的行数 */
+    overflow: hidden; /* 隐藏溢出部分 */
+    text-overflow: ellipsis; /* 使用省略号表示溢出部分 */
+    white-space: normal; /* 正常换行 */
+    font-size: 15px;
+    color: rgb(74,74,74);
+    user-select: none;
+    margin: 0;
+}
 
 </style>
