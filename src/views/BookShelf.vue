@@ -10,6 +10,9 @@
     </div>
     <div class="book-grid-box">
         <BookCard book_id="-1"></BookCard>
+        <BookCard book_id="-1"></BookCard>
+        <BookCard book_id="-1"></BookCard>
+        <BookCard book_id="-1"></BookCard>
     </div>
   </div>
 </template>
@@ -34,10 +37,19 @@ const data = ref({
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin: 0 24px;
-    margin-right: 24px;
-    margin-top: 30px;
-    gap:8px;
+    margin: 0;
+    padding:0;
+    padding-top: 30px;
+    gap:16px;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.shelf-container > *{
+    padding:0 24px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 p{
@@ -83,6 +95,19 @@ p{
     color: rgb(102,102,102);
     user-select: none;
     cursor: pointer;
+}
+
+.book-grid-box{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(154px, 1fr));
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+    padding-top: 24px;
+    padding-left: 54px;
+    padding-right: 30px;
+    box-sizing: border-box;
+    overflow: auto;
 }
 
 </style>
