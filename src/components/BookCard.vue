@@ -5,9 +5,14 @@
         <div class="dot" style="margin-right: 8px;"/>
         <p class="book-last-visit">新添加</p>
     </div>
-    <div class="cover-box">
+    <div :class="{'cover-box':true, selected: isChecked}">
         <img :src="data.cover" class="book-cover">
-        <input type="checkbox" class="book-slecet"/>
+        <input type="checkbox" class="book-slecet" v-model="isChecked"/>
+        <div class="cloud-save">
+            <div class="dot" id="cloud-save-background">
+                <CloudIcon width="20" height="20" style="margin-left: 0.67px;"/>
+            </div> 
+        </div>
     </div>
     <p class="book-title">{{ data.title }}</p>
   </div>
@@ -16,6 +21,7 @@
 <script setup>
 
 import {ref} from 'vue'
+import CloudIcon from '@/assets/cloud.svg'
 
 const props = defineProps({
     book_id:{
@@ -31,6 +37,10 @@ const data = ref({
     title:'13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影'
 })
 
+// is checked
+const isChecked = ref(false)
+
+
 </script>
 
 <style scoped>
@@ -39,7 +49,7 @@ const data = ref({
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap:16px;
+    gap:10px;
     width: 156px;
 }
 
@@ -70,12 +80,15 @@ const data = ref({
     box-shadow: 0 0 4px 0 rgba(154,154,154,0.8);
     transition: border 0.6s;
     cursor: pointer;
+    max-height: 200px;
 }
 
+.selected,
 .cover-box:hover{
     border:rgb(24,144,255) solid 2px;
 }
 
+.selected .book-slecet,
 .cover-box:hover .book-slecet{
     opacity: 1;
 }
@@ -151,16 +164,65 @@ const data = ref({
 
 .book-title{
     width: 100%;
-    display: -webkit-box; /* 必须结合 -webkit-box-orient 使用 */
-    -webkit-box-orient: vertical; /* 设置为垂直排列子元素 */
-    -webkit-line-clamp: 3; /* 限制显示的行数 */
-    overflow: hidden; /* 隐藏溢出部分 */
-    text-overflow: ellipsis; /* 使用省略号表示溢出部分 */
-    white-space: normal; /* 正常换行 */
+    display: -webkit-box; 
+    -webkit-box-orient: vertical; 
+    line-clamp: 3;
+    -webkit-line-clamp: 3; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: normal; 
     font-size: 15px;
     color: rgb(74,74,74);
     user-select: none;
     margin: 0;
+    margin-top:6px;
+}
+
+.cloud-save{
+    position: absolute;
+    bottom: 12px;
+    left: 20px;
+    width: 28px;
+    height: 28px;
+    background:white;   
+    border-radius: 999em;
+    box-shadow: 0 0 6px -2px rgba(108,108,108,0.8);
+    transition: 0.6s;
+}
+
+.cloud-save::after{
+    content: '上传到云端';
+    font-size: 14px;
+    color: rgb(66,165,245);
+    top:6px;
+    left: 30px;
+    position: absolute;
+    font-weight: 500;
+    width: 78px;
+    opacity: 0;
+    transition-delay: 0s;
+    line-height: 14px;
+}
+
+.cover-box:hover .cloud-save{
+    width: 110px;
+}
+
+.cover-box:hover .cloud-save::after{
+    opacity: 1;
+    transition-delay: 0.35s;
+}
+
+#cloud-save-background{
+    width: 22px;
+    height: 22px;
+    background: rgb(80,177,236);
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 </style>
