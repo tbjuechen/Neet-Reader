@@ -11,6 +11,13 @@
     <div class="book-grid-box">
         <BookCard book_id="-1" v-for="item,key in check_list" :key="key" v-model="check_list[key]" :select_mode="select_mode"></BookCard>
     </div>
+    <transition name="select-box">
+        <div class="select-panel" v-if="select_mode">
+            <button>全选</button>
+            <button>取消</button>
+            <button>删除</button>
+        </div>
+    </transition>
   </div>
 </template>
 
@@ -121,6 +128,26 @@ p{
     padding-right: 30px;
     box-sizing: border-box;
     overflow: auto;
+}
+
+.select-panel{
+    position: fixed;
+    bottom: 16px;
+    left: 220px;
+    padding: 0;
+    width: calc(100% - 240px);
+    height: 40px;
+    background: rgb(243,247,250);
+}
+
+.select-box-enter-active,
+.select-box-leave-active {
+    transition: bottom 0.2s;
+}
+
+.select-box-enter-from,
+.select-box-leave-to {
+    bottom: -40px;
 }
 
 </style>
