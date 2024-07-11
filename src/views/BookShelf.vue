@@ -13,6 +13,7 @@
     </div>
     <transition name="select-box">
         <div class="select-panel" v-if="select_mode">
+            <input type="checkbox" id="full-select" @change="handleSelectChange" :checked="select_all">
             <button>全选</button>
             <button>取消</button>
             <button>删除</button>
@@ -47,7 +48,21 @@ const select_mode = computed(() => {
     return check_list.value.some((item) => item === true)
 })
 
+const select_all = computed(() => {
+    return check_list.value.every((item) => item === true)
+})
+
 const select_text = ref('')
+
+const handleSelectChange = (e) => {
+    if (e.target.checked) {
+        check_list.value.forEach((item,index,arr)=> arr[index] = true)
+        console.log(check_list.value)
+    } else {
+        check_list.value.forEach((item,index,arr)=> arr[index] = false)
+        console.log(check_list.value)
+    }
+}
 
 
 </script>
@@ -138,6 +153,10 @@ p{
     width: calc(100% - 240px);
     height: 40px;
     background: rgb(243,247,250);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .select-box-enter-active,
@@ -148,6 +167,27 @@ p{
 .select-box-enter-from,
 .select-box-leave-to {
     bottom: -40px;
+}
+
+#full-select{
+    width: 16px;
+    height: 16px;
+}
+
+#full-select::after{
+    content: '';
+    display: block;
+    transform: translate(3px,3px);
+    width: 10px;
+    height: 10px;
+    background: rgb(24,144,255);
+}
+
+#full-select:checked::after{
+    width: 16px;
+    height: 16px;
+    transform: translate(-8px,-16px);
+    background: none;
 }
 
 </style>

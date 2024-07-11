@@ -5,7 +5,7 @@
         <div class="dot" style="margin-right: 8px;"/>
         <p class="book-last-visit">新添加</p>
     </div>
-    <div :class="{'cover-box':true, selected: (isChecked|select_mode)}">
+    <div :class="{'cover-box':true, selected: (select_mode)}">
         <img :src="data.cover" class="book-cover">
         <input type="checkbox" class="book-slecet" v-model="isChecked" :checked="modelValue" @input="$emit('update:modelValue', $event.target.checked)"/>
         <div class="cloud-save">
@@ -106,68 +106,8 @@ const isChecked = ref(false)
     right: 8px;
     width: 16px;
     height: 16px;
-    /* border: rgb(217,217,217) 1px solid;
-    margin: 0;
-    border-radius:2px;
-    appearance:none;
-    box-sizing:content-box;
-    background: white;
-    transition: border 0.6s, background-color 0.2s, opacity 0.2s; */
     opacity: 0;
 }
-
-/* .book-slecet:hover{
-    border: rgb(24,144,255) 1px solid;
-}
-
-.book-slecet:checked{
-    background: rgb(24,144,255);
-}
-
-.book-slecet:checked::before{
-  content: "✔";
-  text-align: center;
-  color: #fff;
-  width: 16px;
-  height: 16px;
-  transform: translate(0,-1.5px);
-  display: block;
-  animation: check 0.2s forwards;
-}
-
-@keyframes check{
-    0%{
-        transform: translate(0,-1.5px) scale(0);
-    }
-    75%{
-        transform: translate(0,-1.5px) scale(1.2);
-    }
-    100%{
-        transform: translate(0,-1.5px) scale(1);
-    }
-}
-
-.book-slecet:checked::after{
-    content: '';
-    display: block;
-    width: 16px;
-    height: 16px;
-    transform: translate(-8px,-16px);
-    animation: wave 0.3s forwards;
-    box-sizing:content-box;
-    border-radius: 2px;
-}
-
-@keyframes wave {
-    0%{
-        transform: translate(-0.5px,-16.5px) scale(1);
-        border: rgba(24,144,255,1) 1px solid;
-    }
-    100%{
-        transform: translate(-0.5px,-16.5px) scale(1.5);
-        border: rgba(24,144,255,0) 1px solid;
-    }
-} */
 
 .book-title{
     width: 100%;
