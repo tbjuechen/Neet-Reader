@@ -1,17 +1,17 @@
 <template>
   <div id="root-container">
-    <SideBar/>
+    <SideBar />
     <div id="left-sidebar"></div>
     <div id="main-container">
-        <router-view/>
-        <!-- <TBFloatBox top_pos='50' left_pos='50'/> -->
+      <router-view />
+      <!-- <TBFloatBox top_pos='50' left_pos='50'/> -->
     </div>
   </div>
 </template>
 
 <script setup>
-    import SideBar from '@/components/SideBar.vue';
-    import TBFloatBox from '@/components/TBFloatBox.vue';
+import SideBar from "@/components/SideBar.vue";
+import TBFloatBox from "@/components/TBFloatBox.vue";
 </script>
 
 <style scoped>

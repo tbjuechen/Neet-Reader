@@ -1,8 +1,8 @@
 <template>
-  <input 
-    type="checkbox" 
-    class="tb-check-box" 
-    :style="{'--box-color':props.color}" 
+  <input
+    type="checkbox"
+    class="tb-check-box"
+    :style="{ '--box-color': props.color }"
     :value="value"
     :checked="modelValue === value"
     @change="$emit('update:modelValue', value)"
@@ -10,42 +10,40 @@
 </template>
 
 <script setup>
-
 const props = defineProps({
-  color:{
-    type:String,
+  color: {
+    type: String,
   },
   value: {
     type: [String, Number],
-    required: true
+    required: true,
   },
-  modelValue :{
+  modelValue: {
     type: [String, Number],
-    required: true
-  }
-})
-
+    required: true,
+  },
+});
 </script>
 
 <style scoped>
-.tb-check-box{
-  appearance:none;
+.tb-check-box {
+  appearance: none;
   position: relative;
-  width:20px;
-  height:20px;
-  border-radius:50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   padding: 0;
   margin: 0;
   background: var(--box-color);
   cursor: pointer;
 }
 
-.tb-check-box:checked{
+.tb-check-box:checked {
   box-shadow: 0 0 8px -2px var(--box-color);
 }
 
-.tb-check-box:checked:after{
-  content: '✔';
+.tb-check-box:checked:after {
+  content: "✔";
   position: absolute;
   color: white;
   font-size: 14px;

@@ -12,5 +12,4 @@ import DargHeader from "./components/DargHeader.vue";
 </script>
 
 <style>
-
 </style>
