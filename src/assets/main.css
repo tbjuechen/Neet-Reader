@@ -18,18 +18,80 @@ body{
     height: 12px; /* 对于水平滚动条 */
   }
   
-  /* 滚动条轨道 */
-  ::-webkit-scrollbar-track {
-    background: white; 
-  }
-  
-  /* 滚动条滑块 */
-  ::-webkit-scrollbar-thumb {
-    background: rgb(144,144,144); 
-    border-radius: 3px;
-  }
+/* 滚动条轨道 */
+::-webkit-scrollbar-track {
+  background: white; 
+}
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgb(204,204,204); 
-  }
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+  background: rgb(144,144,144); 
+  border-radius: 3px;
+}
 
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(204,204,204); 
+}
+
+input[type="checkbox"]{
+  border: rgb(217,217,217) 1px solid;
+  margin: 0;
+  border-radius:2px;
+  appearance:none;
+  box-sizing:content-box;
+  background: white;
+  transition: border 0.6s, background-color 0.2s, opacity 0.2s;
+}
+
+input[type="checkbox"]:hover{
+  border: rgb(24,144,255) 1px solid;
+}
+
+input[type="checkbox"]:checked{
+  background: rgb(24,144,255);
+}
+
+input[type="checkbox"]:checked::before{
+  content: "✔";
+  text-align: center;
+  color: #fff;
+  width: 16px;
+  height: 16px;
+  transform: translate(0,-1.5px);
+  display: block;
+  animation: check 0.2s forwards;
+}
+
+@keyframes check{
+    0%{
+        transform: translate(0,-1.5px) scale(0);
+    }
+    75%{
+        transform: translate(0,-1.5px) scale(1.2);
+    }
+    100%{
+        transform: translate(0,-1.5px) scale(1);
+    }
+}
+
+input[type="checkbox"]:checked::after{
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    transform: translate(-8px,-16px);
+    animation: wave 0.3s forwards;
+    box-sizing:content-box;
+    border-radius: 2px;
+}
+
+@keyframes wave {
+    0%{
+        transform: translate(-0.5px,-16.5px) scale(1);
+        border: rgba(24,144,255,1) 1px solid;
+    }
+    100%{
+        transform: translate(-0.5px,-16.5px) scale(1.5);
+        border: rgba(24,144,255,0) 1px solid;
+    }
+}

@@ -106,17 +106,17 @@ const isChecked = ref(false)
     right: 8px;
     width: 16px;
     height: 16px;
-    border: rgb(217,217,217) 1px solid;
+    /* border: rgb(217,217,217) 1px solid;
     margin: 0;
     border-radius:2px;
     appearance:none;
     box-sizing:content-box;
     background: white;
-    transition: border 0.6s, background-color 0.2s, opacity 0.2s;
+    transition: border 0.6s, background-color 0.2s, opacity 0.2s; */
     opacity: 0;
 }
 
-.book-slecet:hover{
+/* .book-slecet:hover{
     border: rgb(24,144,255) 1px solid;
 }
 
@@ -167,7 +167,7 @@ const isChecked = ref(false)
         transform: translate(-0.5px,-16.5px) scale(1.5);
         border: rgba(24,144,255,0) 1px solid;
     }
-}
+} */
 
 .book-title{
     width: 100%;
