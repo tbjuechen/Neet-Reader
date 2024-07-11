@@ -116,6 +116,7 @@ ipcMain.handle('open-win', (_, arg) => {
   })
 
   childWindow.setMenu(null);
+  childWindow.webContents.openDevTools();
 
   if (VITE_DEV_SERVER_URL) {
     childWindow.loadURL(`${VITE_DEV_SERVER_URL}book/${arg}`)

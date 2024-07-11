@@ -13,8 +13,9 @@
         v-model="isChecked"
         :checked="modelValue"
         @input="$emit('update:modelValue', $event.target.checked)"
+        @click.stop
       />
-      <div class="cloud-save">
+      <div class="cloud-save" @click.stop>
         <div class="dot" id="cloud-save-background">
           <CloudIcon width="20" height="20" style="margin-left: 0.67px" />
         </div>
