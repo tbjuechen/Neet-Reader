@@ -415,24 +415,6 @@ path {
   z-index: 100;
 }
 
-.drop-box {
-  padding: 6px 0;
-}
-.drop-box-item {
-  padding: 4px 12px;
-  transition: background-color 0.3s;
-}
-
-.drop-box-item:hover {
-  background-color: rgb(245, 245, 245);
-  cursor: pointer;
-}
-
-.drop-box-text {
-  margin: 0;
-  font-size: 14px;
-}
-
 .edit-panel {
   display: flex;
   flex-direction: column;

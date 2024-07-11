@@ -18,9 +18,13 @@ const props = defineProps({
     type: String,
     default: () => "0",
   },
+  style: {
+    type: Object,
+    default: () => (null),
+  },
 });
 
-const style = {
+const style = props.style !== null? props.style :{
   top: props.top_pos + "px",
   left: props.left_pos + "px",
 };
