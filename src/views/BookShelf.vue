@@ -219,7 +219,8 @@ p {
 .book-grid-box {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(154px, 1fr));
-  gap: 12px;
+  grid-column-gap: 18px;
+  grid-row-gap: 36px;
   justify-content: center;
   width: 100%;
   padding-top: 24px;

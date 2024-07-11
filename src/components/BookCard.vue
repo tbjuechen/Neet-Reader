@@ -5,7 +5,7 @@
       <div class="dot" style="margin-right: 8px" />
       <p class="book-last-visit">新添加</p>
     </div>
-    <div :class="{ 'cover-box': true, selected: select_mode }">
+    <div :class="{ 'cover-box': true, selected: select_mode }" @click="handleClickBook">
       <img :src="data.cover" class="book-cover" />
       <input
         type="checkbox"
@@ -51,6 +51,11 @@ const data = ref({
 
 // is checked
 const isChecked = ref(false);
+
+const handleClickBook = () =>{
+  window.ipcRenderer.invoke("open-win",'123')
+}
+
 </script>
 
 <style scoped>

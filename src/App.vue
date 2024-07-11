@@ -1,5 +1,4 @@
 <template>
-  <DargHeader />
   <router-view v-slot="{ Component }">
     <keep-alive>
       <component :is="Component" />
@@ -8,7 +7,6 @@
 </template>
 
 <script setup>
-import DargHeader from "./components/DargHeader.vue";
 </script>
 
 <style>

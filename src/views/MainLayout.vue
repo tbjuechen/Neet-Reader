@@ -1,4 +1,5 @@
 <template>
+  <DargHeader />
   <div id="root-container">
     <SideBar />
     <div id="left-sidebar"></div>
@@ -12,6 +13,7 @@
 <script setup>
 import SideBar from "@/components/SideBar.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
+import DargHeader from "@/components/DargHeader.vue";
 </script>
 
 <style scoped>
