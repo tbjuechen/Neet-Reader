@@ -14,9 +14,9 @@
     <transition name="select-box">
         <div class="select-panel" v-if="select_mode">
             <input type="checkbox" id="full-select" @change="handleSelectChange" :checked="select_all">
-            <button>全选</button>
-            <button>取消</button>
-            <button>删除</button>
+            <TBButton class="select-panel-button">添加至分类</TBButton>
+            <TBButton class="select-panel-button">上&nbsp;传</TBButton>
+            <TBButton class="select-panel-button delete-button">删&nbsp;除</TBButton>
         </div>
     </transition>
   </div>
@@ -27,6 +27,7 @@ import {computed, ref} from 'vue'
 import TBInput from '@/components/TBInput.vue';
 import DownArrowIcon from '@/assets/downArrow.svg'
 import BookCard from '@/components/BookCard.vue'
+import TBButton from '@/components/TBButton.vue';
 
 // 从后端获取
 const data = ref({
@@ -157,6 +158,8 @@ p{
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    gap:8px;
+    padding-left: 12px;
 }
 
 .select-box-enter-active,
@@ -190,4 +193,19 @@ p{
     background: none;
 }
 
+.select-panel-button{
+    width: 108px;
+    height: 24px;
+    border-radius: 2px;
+}
+
+.delete-button{
+  border: rgb(255,77,79) 1px solid;
+  color: rgb(255,77,79);
+}
+
+.delete-button:hover{
+  border: rgb(255,120,117) 1px solid;
+  color: rgb(255,120,117);
+}
 </style>
