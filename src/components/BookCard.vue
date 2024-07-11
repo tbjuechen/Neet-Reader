@@ -5,9 +5,9 @@
         <div class="dot" style="margin-right: 8px;"/>
         <p class="book-last-visit">新添加</p>
     </div>
-    <div :class="{'cover-box':true, selected: isChecked}">
+    <div :class="{'cover-box':true, selected: (isChecked|select_mode)}">
         <img :src="data.cover" class="book-cover">
-        <input type="checkbox" class="book-slecet" v-model="isChecked"/>
+        <input type="checkbox" class="book-slecet" v-model="isChecked" :checked="modelValue" @input="$emit('update:modelValue', $event.target.checked)"/>
         <div class="cloud-save">
             <div class="dot" id="cloud-save-background">
                 <CloudIcon width="20" height="20" style="margin-left: 0.67px;"/>
@@ -27,6 +27,13 @@ const props = defineProps({
     book_id:{
         type: String,
         required: true
+    },
+    modelValue: {
+      type: Boolean,
+    },
+    select_mode: {
+        type: Boolean,
+        default: false
     }
 })
 

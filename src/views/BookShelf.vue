@@ -5,20 +5,17 @@
         <p id="book-cnt">({{ data.size }})</p>
     </div>
     <div id="filter-box">
-        <TBInput id="book-filter" style="box-sizing:border-box; width: 100%;" placeholder="输入书名，进行筛选"/>
+        <TBInput id="book-filter" style="box-sizing:border-box; width: 100%;" placeholder="输入书名，进行筛选" v-model="select_text" :select_mode="select_mode"/>
         <p id="sort">排序<DownArrowIcon style="width: 12px; transform: translate(8px,3px); fill:rgb(198,198,198)"/></p>
     </div>
     <div class="book-grid-box">
-        <BookCard book_id="-1"></BookCard>
-        <BookCard book_id="-1"></BookCard>
-        <BookCard book_id="-1"></BookCard>
-        <BookCard book_id="-1"></BookCard>
+        <BookCard book_id="-1" v-for="item,key in check_list" :key="key" v-model="check_list[key]" :select_mode="select_mode"></BookCard>
     </div>
   </div>
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 import TBInput from '@/components/TBInput.vue';
 import DownArrowIcon from '@/assets/downArrow.svg'
 import BookCard from '@/components/BookCard.vue'
@@ -28,6 +25,22 @@ const data = ref({
     name:'分类',
     size:16
 })
+
+// for test
+const check_list = ref([false,false,false, false, false, false, false])
+
+// const print = () => {
+//     console.log(check_list.value)
+//     setTimeout(print, 10000)
+// }
+
+// print()
+
+const select_mode = computed(() => {
+    return check_list.value.some((item) => item === true)
+})
+
+const select_text = ref('')
 
 
 </script>
