@@ -4,17 +4,19 @@
       <p class="catalog-title">目录</p>
       <TBDivider/>
       <div class="chapter-list">
-        <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}">
+        <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}" @click.stop>
           <p class="chapter-title">{{ item.label }}</p>
         </div>
       </div>
-      <TBButton @click="prevPage">上一页</TBButton>
-      <TBButton @click="nextPage">下一页</TBButton>
     </div> 
+    <div class="turn-page" id="prev" @click="prevPage"/>
     <div id="read"></div>
+    <div class="turn-page" id="next" @click="nextPage"/>
   </div>
-  <TBFloatBox class="head-setting-panel">
+  <TBFloatBox top_pos="0" left_pos="0" v-if="displaySetting">
+    <div id="head-setting-panel">
 
+    </div>
   </TBFloatBox>
 </template>
 
@@ -24,18 +26,16 @@ import { onMounted, ref } from "vue";
 import TBDivider from "@/components/TBDivider.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
 
-// for dev
-import TBButton from "@/components/TBButton.vue";
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
 const book = Epub(exampleBoolURL)
 console.log(book)
 const fontSize = ref(16)
 
-const remianHeight = window.innerHeight
 const rendition = book.renderTo("read",{
-  width: (remianHeight-300).toString() + "px",
-  height: "100vh",
+  width: (window.innerWidth-460).toString() + "px",
+  // width: "500px",
+  height: (window.innerHeight-80).toString() + "px",
 })
 rendition.spread('auto')
 rendition.display()
@@ -47,7 +47,7 @@ book.ready.then(()=>{
   
   // 分页
   book.locations.generate(
-    750 * ((window.innerWidth - 300) / 375 * (fontSize/16))
+    750 * ((window.innerWidth - 460) / 375 * (fontSize/16))
   ).then((location)=>{
     console.log(location)
   })
@@ -59,13 +59,23 @@ const junpTo = (herf)=>{
 }
 
 // 翻页
-const prevPage = () => {
+const prevPage = (e) => {
   rendition.prev()
+  e.stopPropagation();
 }
 
-const nextPage = () => {
-  rendition.next()
+const nextPage = (e) => {
+  rendition.next();
+  e.stopPropagation();
 }
+
+// 设置栏隐藏
+const displaySetting = ref(true)
+const changeDisplay = () => {
+  displaySetting.value = !displaySetting.value
+}
+
+window.addEventListener('click', changeDisplay)
 </script>
 
 <style scoped>
@@ -87,6 +97,8 @@ const nextPage = () => {
 
 #read{
   flex-grow: 1;
+  padding-top: 60px;
+  padding-bottom: 20px;
 }
 
 .catalog-title{
@@ -130,6 +142,40 @@ const nextPage = () => {
   margin-top:16px;
 }
 
+#head-setting-panel{
+  width: 100vw;
+  height: 40px;
+}
 
+.turn-page{
+ height: 100vh;
+ width: 80px; 
+ position: relative;
+ cursor: pointer;
+}
+
+.turn-page::after{
+  position: absolute;
+  bottom: 300px;
+  left: 20px;
+  font-size: 40px;
+  font-weight: 800;
+  transform: scale(1, 2);
+  color: rgb(197,197,197);
+  opacity: 0;
+  transition: all 0.6s;
+}
+
+.turn-page:hover::after{
+  opacity: 1;
+}
+
+#prev::after{
+  content:"<";
+}
+
+#next::after{
+  content:">";
+}
 
 </style>
