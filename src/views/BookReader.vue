@@ -1,26 +1,29 @@
 <template>
   <div class="container">
-    <div class="left-contianer bordered" v-if="displayLeftBar">
-      <div id="catalog" v-if="displayCatalog">
-        <p class="catalog-title">目录</p>
-        <TBDivider/>
-        <div class="chapter-list">
-          <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}" @click.stop>
-            <p class="chapter-title">{{ item.label }}</p>
+    <transition name="left-bar">
+      <div class="left-contianer bordered" v-if="displayLeftBar">
+        <div id="catalog" v-if="displayCatalog">
+          <p class="catalog-title">目录</p>
+          <TBDivider/>
+          <div class="chapter-list">
+            <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}" @click.stop>
+              <p class="chapter-title">{{ item.label }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div id="note" v-if="displayNote">
-        <p class="catalog-title">重点与笔记</p>
-        <TBDivider style="width: 300px;"/>
-
+        <div id="note" v-if="displayNote">
+          <p class="catalog-title">重点与笔记</p>
+          <TBDivider style="width: 300px;"/>
+          
+        </div>
       </div>
+    </transition>
+    <div class="reader-warper">
+      <div class="turn-page" id="prev" @click="prevPage"/>
+      <div id="read"></div>
+      <div class="turn-page" id="next" @click="nextPage"/>
     </div>
- 
-    <div class="turn-page" id="prev" @click="prevPage"/>
-    <div id="read"></div>
-    <div class="turn-page" id="next" @click="nextPage"/>
   </div>
   <Teleport to="body">
     <transition name="setting-panel">
@@ -43,7 +46,7 @@
 
 <script setup>
 import Epub from "epubjs";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import TBDivider from "@/components/TBDivider.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
 import CatalogIcon from "@/assets/catalog.svg"
@@ -55,6 +58,11 @@ const book = Epub(exampleBoolURL)
 console.log(book)
 const fontSize = ref(16)
 var rendition
+
+// 目录/笔记 控制
+const displayLeftBar = ref(true)
+const displayCatalog = ref(true)
+const displayNote = ref(false)
 
 const navigation = ref()
 
@@ -110,11 +118,11 @@ const handleClick = () => {
 }
 
 // 将书本挂载到 read 上
-const initRendition = () => {
+const initRendition = (leftBar=true) => {
   rendition = book.renderTo("read",{
-    width: (window.innerWidth-460).toString() + "px",
+    width: (window.innerWidth- (leftBar?470:170)).toString() + "px",
     // width: "500px",
-    height: (window.innerHeight-80).toString() + "px",
+    height: (window.innerHeight-90).toString() + "px",
   })
   rendition.spread('auto', 640)
   rendition.display()
@@ -137,21 +145,16 @@ const initRendition = () => {
   })
 }
 
-initRendition();
+initRendition(displayLeftBar.value);
 
 // 窗口变化时重新挂载阅读器
 onMounted(()=>{
   window.onresize = ()=>{
     // 可能需要防抖
     rendition.destroy()
-    initRendition();
+    initRendition(displayLeftBar.value);
   }
 })
-
-// 目录/笔记 控制
-const displayLeftBar = ref(true)
-const displayCatalog = ref(true)
-const displayNote = ref(false)
 
 const handleClikeCatalog = () => {
   if (displayLeftBar.value) {
@@ -163,6 +166,8 @@ const handleClikeCatalog = () => {
     }
   } else {
     displayLeftBar.value = true
+    displayCatalog.value = true
+    displayNote.value = false
   }
 }
 
@@ -176,8 +181,15 @@ const handleClickNote = () => {
     }
   } else {
     displayLeftBar.value = true
+    displayCatalog.value = false
+    displayNote.value = true
   }
 }
+
+watch(displayLeftBar,async (newValue, oldValue)=>{
+  rendition.destroy();
+  initRendition(newValue);
+})
 
 </script>
 
@@ -194,6 +206,7 @@ const handleClickNote = () => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 300px;
 }
 
 #read{
@@ -201,6 +214,7 @@ const handleClickNote = () => {
   padding-top: 60px;
   padding-bottom: 20px;
   user-select: none;
+  box-sizing: border-box;
 }
 
 .catalog-title{
@@ -378,5 +392,23 @@ const handleClickNote = () => {
 .side-buttom-box:hover .float{
   opacity: 1;
   transform: scale(1);
+}
+
+.left-bar-enter-active,
+.left-bar-leave-active {
+  transition: all 0.4s;
+}
+
+.left-bar-enter-from,
+.left-bar-leave-to {
+  transform: translate(-300px, 0);
+}
+
+.reader-warper{
+  flex:1;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  position: relative;
 }
 </style>
