@@ -1,14 +1,23 @@
 <template>
   <div class="container">
-    <div id="catalog" class="bordered">
-      <p class="catalog-title">目录</p>
-      <TBDivider/>
-      <div class="chapter-list">
-        <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}" @click.stop>
-          <p class="chapter-title">{{ item.label }}</p>
+    <div class="left-contianer bordered" v-if="displayLeftBar">
+      <div id="catalog" v-if="displayCatalog">
+        <p class="catalog-title">目录</p>
+        <TBDivider/>
+        <div class="chapter-list">
+          <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}" @click.stop>
+            <p class="chapter-title">{{ item.label }}</p>
+          </div>
         </div>
       </div>
-    </div> 
+
+      <div id="note" v-if="displayNote">
+        <p class="catalog-title">重点与笔记</p>
+        <TBDivider style="width: 300px;"/>
+
+      </div>
+    </div>
+ 
     <div class="turn-page" id="prev" @click="prevPage"/>
     <div id="read"></div>
     <div class="turn-page" id="next" @click="nextPage"/>
@@ -16,6 +25,15 @@
   <Teleport to="body">
     <transition name="setting-panel">
       <div id="head-setting-panel" class="bordered" v-if="displaySetting">
+        <p class="logo"> Neet&nbsp;Reader</p>
+        <div class="side-buttom-box" @click="handleClikeCatalog">
+          <CatalogIcon class="side-icon"/>
+          <div class="float"><span>目录</span></div>
+        </div>
+        <div class="side-buttom-box" @click="handleClickNote">
+          <RecordIcon class="side-icon"/>   
+          <div class="float"><span>笔记</span></div>
+        </div>
       </div>
     </transition>
   </Teleport>
@@ -28,6 +46,8 @@ import Epub from "epubjs";
 import { onMounted, ref } from "vue";
 import TBDivider from "@/components/TBDivider.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
+import CatalogIcon from "@/assets/catalog.svg"
+import RecordIcon from "@/assets/record.svg"
 
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
@@ -71,8 +91,8 @@ const displaySetting = ref(true)
 const changeDisplay = () => {
   displaySetting.value = !displaySetting.value
 }
-// 绑定到window
-window.addEventListener('click', changeDisplay)
+// // 绑定到window
+// window.addEventListener('click', changeDisplay)
 
 
 // 处理鼠标点击
@@ -96,9 +116,9 @@ const initRendition = () => {
     // width: "500px",
     height: (window.innerHeight-80).toString() + "px",
   })
-  rendition.spread('auto')
+  rendition.spread('auto', 640)
   rendition.display()
-  
+
   rendition.on('mousedown',(event) =>{
     mouseDownTime = new Date().getTime()
     mouseDownPos = {
@@ -128,6 +148,37 @@ onMounted(()=>{
   }
 })
 
+// 目录/笔记 控制
+const displayLeftBar = ref(true)
+const displayCatalog = ref(true)
+const displayNote = ref(false)
+
+const handleClikeCatalog = () => {
+  if (displayLeftBar.value) {
+    if (displayCatalog.value){
+      displayLeftBar.value = false
+    } else {
+      displayCatalog.value = true
+      displayNote.value = false
+    }
+  } else {
+    displayLeftBar.value = true
+  }
+}
+
+const handleClickNote = () => {
+  if (displayLeftBar.value) {
+    if (displayNote.value){
+      displayLeftBar.value = false
+    } else {
+      displayCatalog.value = false
+      displayNote.value = true
+    }
+  } else {
+    displayLeftBar.value = true
+  }
+}
+
 </script>
 
 <style scoped>
@@ -139,18 +190,17 @@ onMounted(()=>{
 }
 
 #catalog{
-  flex-grow: 0;
-  min-width: 300px;
-  height: 100vh;
   background: rgb(248,248,250);
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 #read{
   flex-grow: 1;
   padding-top: 60px;
   padding-bottom: 20px;
+  user-select: none;
 }
 
 .catalog-title{
@@ -201,6 +251,11 @@ onMounted(()=>{
   top: 0;
   left: 0;
   background: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 16px;
+  gap:12px
 }
 
 .turn-page{
@@ -249,4 +304,79 @@ onMounted(()=>{
   box-sizing: border-box;
 }
 
+.logo{
+  margin: 0;
+  user-select: none;
+  font-weight: bold;
+  font-size: 14px;
+  color: rgb(66,165,245);
+  margin-right: 24px;
+}
+
+.left-container{
+  flex-grow: 0;
+  min-width: 300px;
+  height: 100vh;
+}
+
+#note{
+  display: flex;
+  flex-direction: column;
+}
+
+.side-icon{
+  fill: rgb(112,112,112);
+  height: 16px;
+  width: 16px;
+  cursor: pointer;
+  position: relative;
+}
+
+.side-icon:hover{
+  fill: rgb(16,16,16)
+}
+
+.float{
+  position: absolute;
+  width: 48px;
+  height: 32px;
+  background: rgba(24,24,24,0.8);
+  top: 40px;
+  left: -16px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color:rgb(251,251,251);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s;
+}
+
+.float span{
+  font-size: 14px;
+}
+
+.float::after{
+  content: '';
+  height: 6px;
+  width: 6px;
+  /* border-left: rgba(24,24,24,0.8) solid 3px;
+  border-top: rgba(24,24,24,0.8) solid 3px; */
+  background: linear-gradient(45deg, rgba(24,24,24,0.8), rgba(24,24,24,0.8) 50%, transparent 50%, transparent 100%);
+  position: absolute;
+  top:-2.5px;
+  transform: rotate(135deg);
+}
+
+.side-buttom-box{
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.side-buttom-box:hover .float{
+  opacity: 1;
+  transform: scale(1);
+}
 </style>
