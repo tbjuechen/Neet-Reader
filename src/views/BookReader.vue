@@ -31,14 +31,30 @@ const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：�
 const book = Epub(exampleBoolURL)
 console.log(book)
 const fontSize = ref(16)
+var rendition = ''
 
-const rendition = book.renderTo("read",{
-  width: (window.innerWidth-460).toString() + "px",
-  // width: "500px",
-  height: (window.innerHeight-80).toString() + "px",
+// 将书本挂载到 read 上
+const initRendition = () => {
+  rendition = book.renderTo("read",{
+    width: (window.innerWidth-460).toString() + "px",
+    // width: "500px",
+    height: (window.innerHeight-80).toString() + "px",
+  })
+  rendition.spread('auto')
+  rendition.display()
+}
+
+initRendition();
+
+// 窗口变化时重新挂载阅读器
+onMounted(()=>{
+  window.onresize = ()=>{
+    // 可能需要防抖
+    rendition.destroy()
+    initRendition();
+  }
 })
-rendition.spread('auto')
-rendition.display()
+
 const navigation = ref()
 
 book.ready.then(()=>{
