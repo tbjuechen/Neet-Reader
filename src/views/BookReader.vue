@@ -23,6 +23,7 @@
       <div class="turn-page" id="prev" @click="prevPage"/>
       <div id="read"></div>
       <div class="turn-page" id="next" @click="nextPage"/>
+      <TimeBar class="time"/>
     </div>
   </div>
   <Teleport to="body">
@@ -51,6 +52,7 @@ import TBDivider from "@/components/TBDivider.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
 import CatalogIcon from "@/assets/catalog.svg"
 import RecordIcon from "@/assets/record.svg"
+import TimeBar from "@/components/TimeBar.vue"
 
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
@@ -327,7 +329,7 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
   margin-right: 24px;
 }
 
-.left-container{
+.left-contianer{
   flex-grow: 0;
   min-width: 300px;
   height: 100vh;
@@ -410,5 +412,17 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
   flex-direction: row;
   box-sizing: border-box;
   position: relative;
+}
+
+.time{
+  position: absolute;
+  left: 10px;
+}
+
+.time :deep(span){
+  color: rgb(157,157,157);
+  font-size: 12px;
+  line-height: 12px;
+  font-weight: 500;
 }
 </style>
