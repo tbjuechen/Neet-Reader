@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div id="catalog">
+    <div id="catalog" class="bordered">
       <p class="catalog-title">目录</p>
       <TBDivider/>
       <div class="chapter-list">
@@ -13,11 +13,14 @@
     <div id="read"></div>
     <div class="turn-page" id="next" @click="nextPage"/>
   </div>
-  <TBFloatBox top_pos="0" left_pos="0" v-if="displaySetting">
-    <div id="head-setting-panel">
+  <Teleport to="body">
+    <transition name="setting-panel">
+      <div id="head-setting-panel" class="bordered" v-if="displaySetting">
+      </div>
+    </transition>
+  </Teleport>
 
-    </div>
-  </TBFloatBox>
+  
 </template>
 
 <script setup>
@@ -31,29 +34,7 @@ const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：�
 const book = Epub(exampleBoolURL)
 console.log(book)
 const fontSize = ref(16)
-var rendition = ''
-
-// 将书本挂载到 read 上
-const initRendition = () => {
-  rendition = book.renderTo("read",{
-    width: (window.innerWidth-460).toString() + "px",
-    // width: "500px",
-    height: (window.innerHeight-80).toString() + "px",
-  })
-  rendition.spread('auto')
-  rendition.display()
-}
-
-initRendition();
-
-// 窗口变化时重新挂载阅读器
-onMounted(()=>{
-  window.onresize = ()=>{
-    // 可能需要防抖
-    rendition.destroy()
-    initRendition();
-  }
-})
+var rendition
 
 const navigation = ref()
 
@@ -90,8 +71,63 @@ const displaySetting = ref(true)
 const changeDisplay = () => {
   displaySetting.value = !displaySetting.value
 }
-
+// 绑定到window
 window.addEventListener('click', changeDisplay)
+
+
+// 处理鼠标点击
+var mouseDownTime
+var mouseUpTime
+var mouseDownPos
+var mouseUpPos
+
+const handleClick = () => {
+  const move = Math.abs(mouseDownPos.x - mouseUpPos.x) + Math.abs(mouseDownPos.y - mouseUpPos.y)
+  const deltaTime = mouseUpTime - mouseDownTime
+  if (move < 100 & deltaTime < 200){
+    changeDisplay();
+  }
+}
+
+// 将书本挂载到 read 上
+const initRendition = () => {
+  rendition = book.renderTo("read",{
+    width: (window.innerWidth-460).toString() + "px",
+    // width: "500px",
+    height: (window.innerHeight-80).toString() + "px",
+  })
+  rendition.spread('auto')
+  rendition.display()
+  
+  rendition.on('mousedown',(event) =>{
+    mouseDownTime = new Date().getTime()
+    mouseDownPos = {
+      x:event.clientX,
+      y:event.clientY
+    }
+  })
+
+  rendition.on('mouseup',(event) =>{
+    mouseUpTime = new Date().getTime()
+    mouseUpPos = {
+      x:event.clientX,
+      y:event.clientY
+    }
+    handleClick()
+  })
+}
+
+initRendition();
+
+// 窗口变化时重新挂载阅读器
+onMounted(()=>{
+  window.onresize = ()=>{
+    // 可能需要防抖
+    rendition.destroy()
+    initRendition();
+  }
+})
+
 </script>
 
 <style scoped>
@@ -160,7 +196,11 @@ window.addEventListener('click', changeDisplay)
 
 #head-setting-panel{
   width: 100vw;
-  height: 40px;
+  height: 42px;
+  position:absolute;
+  top: 0;
+  left: 0;
+  background: white;
 }
 
 .turn-page{
@@ -192,6 +232,21 @@ window.addEventListener('click', changeDisplay)
 
 #next::after{
   content:">";
+}
+
+.setting-panel-enter-active,
+.setting-panel-leave-active {
+  transition: all 0.3s;
+}
+
+.setting-panel-enter-from,
+.setting-panel-leave-to {
+  transform: translate(0,-40px);
+}
+
+.bordered{
+  border: rgb(228,228,228) solid 1px;
+  box-sizing: border-box;
 }
 
 </style>
