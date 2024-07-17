@@ -23,7 +23,14 @@
       <div class="turn-page" id="prev" @click="prevPage"/>
       <div id="read"></div>
       <div class="turn-page" id="next" @click="nextPage"/>
-      <TimeBar class="time"/>
+      <transition name="time">
+        <TimeBar class="time" v-if="!displaySetting"/>
+      </transition>
+      <transition name="downArrow">
+        <div id="show-setting-box" v-if="!displaySetting" @click="changeDisplay">
+          <DownArrow/>
+        </div>
+      </transition>
     </div>
   </div>
   <Teleport to="body">
@@ -53,7 +60,7 @@ import TBFloatBox from "@/components/TBFloatBox.vue";
 import CatalogIcon from "@/assets/catalog.svg"
 import RecordIcon from "@/assets/record.svg"
 import TimeBar from "@/components/TimeBar.vue"
-
+import DownArrow from "@/assets/downArrow-2.svg"
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
 const book = Epub(exampleBoolURL)
@@ -417,12 +424,61 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
 .time{
   position: absolute;
   left: 10px;
+  height: 40px;
 }
 
 .time :deep(span){
   color: rgb(157,157,157);
   font-size: 12px;
-  line-height: 12px;
+  line-height: 40px;
   font-weight: 500;
+  text-align: center;
+}
+
+.time-enter-active,
+.time-leave-active {
+  transition: all 0.4s;
+}
+
+.time-enter-from,
+.time-leave-to {
+  transform: translate(0, -40px);
+}
+
+#show-setting-box{
+  position: absolute;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  top: 0px;
+  border: rgb(255,255,255) solid 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.4s;
+}
+
+#show-setting-box:hover{
+  cursor: pointer;
+  border: rgb(228,228,228) solid 1px;
+  box-shadow: 0 2px 4px rgba(108,108,108,0.1);
+}
+
+#show-setting-box :deep(svg){
+  fill: rgb(206,206,206);
+}
+
+#show-setting-box:hover :deep(svg){
+  fill: rgb(102,102,102);
+}
+
+.downArrow-enter-active,
+.downArrow-leave-active {
+  transition: all 0.4s;
+}
+
+.downArrow-enter-from,
+.downArrow-leave-to {
+  transform: translate(0, -40px);
 }
 </style>
