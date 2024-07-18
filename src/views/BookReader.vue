@@ -59,6 +59,19 @@
     </transition>
   </Teleport>
 
+  <Teleport to="body">
+    <transition name="bottom-process">
+      <div id="bottom-process-panel" class="bordered" v-if="displaySetting">
+        <div class="chapter-control-box">
+          <PrevIcon class="chapter-icon"/>
+          <TBInput v-model="currentSection" class="chapter-input"/>
+          <p> /&nbsp;{{ navigation.length }}</p>
+          <NextIcon class="chapter-icon"/>
+        </div>
+      </div>
+    </transition>
+  </Teleport>
+
   
 </template>
 
@@ -72,6 +85,9 @@ import RecordIcon from "@/assets/record.svg"
 import TimeBar from "@/components/TimeBar.vue"
 import DownArrow from "@/assets/downArrow-2.svg"
 import MiniProgressBar from "@/components/MiniProgressBar.vue"
+import NextIcon from "@/assets/next.svg"
+import PrevIcon from "@/assets/prev.svg"
+import TBInput from "@/components/TBInput.vue";
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
 const book = Epub(exampleBoolURL)
@@ -613,13 +629,70 @@ watch(process, async (newValue)=>{
   margin-right: 12px;
 }
 
+
+.bottom-process-enter-active,
+.bottom-process-leave-active,
 .bottom-bar-enter-active,
 .bottom-bar-leave-active {
   transition: all 0.4s;
 }
 
+.bottom-process-enter-from,
+.bottom-process-leave-to,
 .bottom-bar-enter-from,
 .bottom-bar-leave-to {
   transform: translate(0, 40px);
+}
+
+#bottom-process-panel{
+  width: 100vw;
+  height: 42px;
+  position:absolute;
+  bottom: 0;
+  left: 0;
+  background: white;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.chapter-control-box{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.chapter-input{
+  width: 24px;
+  margin-left: 12px;
+  margin-right: 8px;
+  height: 20px;
+  font-size: 12px;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0;
+  /* line-height: 20px;
+  vertical-align: middle; */
+  font-size: 12px;
+  padding-top: 2px;
+  /* transform: translate(0,1.5px); */
+}
+
+.chapter-control-box p{
+  margin: 0;
+  font-size: 12px;
+  margin-right: 12px;
+  user-select: none;
+  line-height: 12px;
+}
+
+.chapter-input,
+.chapter-control-box p{
+  color: rgb(102,102,102);
+}
+
+.chapter-icon{
+  fill: rgb(102,102,102);
 }
 </style>

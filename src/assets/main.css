@@ -10,6 +10,7 @@
 body{
     margin: 0;
     position: relative;
+    overflow: hidden;
 }
 
 /* 定义滚动条宽度 */
