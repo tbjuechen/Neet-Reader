@@ -33,9 +33,10 @@
         </div>
       </transition>
       <transition name="bottom-bar">
-        <div class="bottom-bar">
+        <div class="bottom-bar" v-if="!displaySetting">
           <div class="message-box">
-            <!-- 章节名 & 进度 -->
+            <p class="current-title" v-if="navigation"> {{ navigation[currentSection].label}}</p>
+            <p class="current-process" v-if="process">{{ process }}</p>
           </div>
           <MiniProgressBar id="mini-progress" :process="process"/>
         </div>
@@ -283,6 +284,7 @@ watch(process, async (newValue)=>{
   height: 100%;
   display: flex;
   flex-direction: row;
+  overflow: hidden;
 }
 
 #catalog{
@@ -578,6 +580,8 @@ watch(process, async (newValue)=>{
 .message-box{
   flex-grow: 1;
   width: 100%;
+  display: flex;
+  flex-direction: row;
 }
 
 #mini-progress{
@@ -586,5 +590,36 @@ watch(process, async (newValue)=>{
 
 .current-chapter{
   color: rgb(69,162,239);
+}
+
+.current-title{
+  margin: 0;
+  font-size: 12px;
+  padding-top: 12px;
+  padding-left: 12px;
+  color: rgb(172,172,172);
+  flex-grow: 1;
+  user-select: none;
+}
+
+.current-process{
+  margin: 0;
+  font-size: 12px;
+  padding-top: 12px;
+  color: rgb(172,172,172);
+  width: 50px;
+  text-align: right;
+  user-select: none;
+  margin-right: 12px;
+}
+
+.bottom-bar-enter-active,
+.bottom-bar-leave-active {
+  transition: all 0.4s;
+}
+
+.bottom-bar-enter-from,
+.bottom-bar-leave-to {
+  transform: translate(0, 40px);
 }
 </style>
