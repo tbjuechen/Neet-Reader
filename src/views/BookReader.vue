@@ -7,7 +7,8 @@
           <TBDivider/>
           <div class="chapter-list">
             <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}" @click.stop>
-              <p class="chapter-title">{{ item.label }}</p>
+              <p :class="{'chapter-title':true, 'current-chapter': index === currentSection}">{{ item.label }}</p>
+              <p class="chapter-process">{{ navigationProcess[index] }}</p>
             </div>
           </div>
         </div>
@@ -29,6 +30,14 @@
       <transition name="downArrow">
         <div id="show-setting-box" v-if="!displaySetting" @click="changeDisplay">
           <DownArrow/>
+        </div>
+      </transition>
+      <transition name="bottom-bar">
+        <div class="bottom-bar">
+          <div class="message-box">
+            <!-- 章节名 & 进度 -->
+          </div>
+          <MiniProgressBar id="mini-progress" :process="process"/>
         </div>
       </transition>
     </div>
@@ -61,6 +70,7 @@ import CatalogIcon from "@/assets/catalog.svg"
 import RecordIcon from "@/assets/record.svg"
 import TimeBar from "@/components/TimeBar.vue"
 import DownArrow from "@/assets/downArrow-2.svg"
+import MiniProgressBar from "@/components/MiniProgressBar.vue"
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
 const book = Epub(exampleBoolURL)
@@ -73,7 +83,19 @@ const displayLeftBar = ref(true)
 const displayCatalog = ref(true)
 const displayNote = ref(false)
 
+
+// 目录进度控制
 const navigation = ref()
+const navigationProcess = ref([])
+const process = ref('0.00%')
+const currentSection = ref(0)
+
+// 格式化 process
+const formatProcess = (process) =>{
+  return (process * 100).toFixed(2) + '%'
+}
+
+
 
 book.ready.then(()=>{
   // 加载目录
@@ -84,22 +106,31 @@ book.ready.then(()=>{
     750 * ((window.innerWidth - 460) / 375 * (fontSize/16))
   ).then((location)=>{
     console.log(location)
+    navigation.value.forEach((item)=>{
+      navigationProcess.value.push(
+        formatProcess(book.locations.percentageFromCfi(book.spine.get(item.href).cfiFromRange(0)))
+      )
+    })
+    console.log(navigationProcess.value)
   })
 })
 
+
 // 跳转到指定目录
 const junpTo = (herf)=>{
-  rendition.display(herf)
+  rendition.display(herf).then(()=>{
+    process.value = formatProcess(rendition.currentLocation().start.percentage)
+  })
 }
 
 // 翻页
 const prevPage = (e) => {
-  rendition.prev()
+  rendition.prev().then(()=>{process.value = formatProcess(rendition.currentLocation().start.percentage)});
   e.stopPropagation();
 }
 
 const nextPage = (e) => {
-  rendition.next();
+  rendition.next().then(()=>{process.value = formatProcess(rendition.currentLocation().start.percentage)});
   e.stopPropagation();
 }
 
@@ -134,7 +165,9 @@ const initRendition = (leftBar=true) => {
     height: (window.innerHeight-90).toString() + "px",
   })
   rendition.spread('auto', 640)
-  rendition.display()
+  rendition.display().then(()=>{
+    process.value = formatProcess(rendition.currentLocation().start.percentage)
+  })
 
   rendition.on('mousedown',(event) =>{
     mouseDownTime = new Date().getTime()
@@ -155,6 +188,19 @@ const initRendition = (leftBar=true) => {
 }
 
 initRendition(displayLeftBar.value);
+
+
+// 我也不知道为啥挂载完时并没有 currentLaocation 官方文档就是屎
+// const getProcess = () => {
+//   try{
+//     process.value = formatProcess(rendition.currentLocation().start.percentage)
+//   }catch(e){
+//     setTimeout(() => {
+//       getProcess()
+//     }, 100);
+//   }
+// }
+// getProcess()
 
 // 窗口变化时重新挂载阅读器
 onMounted(()=>{
@@ -199,6 +245,35 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
   rendition.destroy();
   initRendition(newValue);
 })
+
+watch(process, async (newValue)=>{
+  const findSection = () => {
+    // console.log(newValue)
+    const lessThan = (arg1, arg2)=>{
+      return Number(arg1.slice(0,arg1.length - 1)) < Number(arg2.slice(0,arg2.length - 1))
+    }
+    // 封面
+    if (lessThan(newValue,navigationProcess.value[0])){
+      currentSection.value = 0
+      return
+    }
+
+    // 找到属于哪一章
+    for (var i = 1;i < navigationProcess.value.length; i++){
+      if (lessThan(newValue, navigationProcess.value[i])){
+        currentSection.value = i-1
+        return
+      }
+    }
+
+    // 最后一章
+    currentSection.value = navigationProcess.value.length - 1
+  }
+  findSection();
+  console.log(currentSection.value)
+})
+
+
 
 </script>
 
@@ -246,6 +321,7 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
   align-items: center;
   transition: all 0.1s;
   cursor: pointer;
+  padding-right: 12px;
 }
 
 .chapter-item:hover{
@@ -261,6 +337,13 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
   font-size: 14px;
   user-select: none;
   color: rgb(51,51,51);
+}
+
+.chapter-process{
+  font-size: 12px;
+  text-align: right;
+  color: rgb(153,153,165);
+  flex-grow: 1;
 }
 
 .chapter-list{
@@ -480,5 +563,28 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
 .downArrow-enter-from,
 .downArrow-leave-to {
   transform: translate(0, -40px);
+}
+
+.bottom-bar{
+  position:absolute;
+  left: 0;
+  bottom: 0;
+  height: 40px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-box{
+  flex-grow: 1;
+  width: 100%;
+}
+
+#mini-progress{
+  width: 100%;
+}
+
+.current-chapter{
+  color: rgb(69,162,239);
 }
 </style>
