@@ -6,8 +6,8 @@
           <p class="catalog-title">目录</p>
           <TBDivider/>
           <div class="chapter-list">
-            <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{junpTo(item.href)}" @click.stop>
-              <p :class="{'chapter-title':true, 'current-chapter': index === currentSection}">{{ item.label }}</p>
+            <div v-for="item,index in navigation" :key="index" class="chapter-item" @click="()=>{jumpTo(item.href)}" @click.stop>
+              <p :class="{'chapter-title':true, 'current-chapter': index.toString() === currentSection}">{{ item.label }}</p>
               <p class="chapter-process">{{ navigationProcess[index] }}</p>
             </div>
           </div>
@@ -63,11 +63,13 @@
     <transition name="bottom-process">
       <div id="bottom-process-panel" class="bordered" v-if="displaySetting">
         <div class="chapter-control-box">
-          <PrevIcon class="chapter-icon"/>
+          <PrevIcon class="chapter-icon" @click="prevSection"/>
           <TBInput v-model="currentSection" class="chapter-input"/>
-          <p> /&nbsp;{{ navigation.length }}</p>
-          <NextIcon class="chapter-icon"/>
+          <p> /&nbsp;{{ navigation?navigation.length - 1:0 }}</p>
+          <NextIcon class="chapter-icon" @click="nextSection"/>
         </div>
+        <TBDivider direction="vertical" style="height: 60%;"/>
+        <input type="range" class="range-bar" min="0" max="100" step="1" v-model="process4bar" :style="{'--position':process4bar.toString() + '%'}"/>
       </div>
     </transition>
   </Teleport>
@@ -105,7 +107,8 @@ const displayNote = ref(false)
 const navigation = ref()
 const navigationProcess = ref([])
 const process = ref('0.00%')
-const currentSection = ref(0)
+const currentSection = ref('0')
+const process4bar = ref(0)
 
 // 格式化 process
 const formatProcess = (process) =>{
@@ -134,7 +137,7 @@ book.ready.then(()=>{
 
 
 // 跳转到指定目录
-const junpTo = (herf)=>{
+const jumpTo = (herf)=>{
   rendition.display(herf).then(()=>{
     process.value = formatProcess(rendition.currentLocation().start.percentage)
   })
@@ -271,26 +274,43 @@ watch(process, async (newValue)=>{
     }
     // 封面
     if (lessThan(newValue,navigationProcess.value[0])){
-      currentSection.value = 0
+      currentSection.value = '0'
       return
     }
 
     // 找到属于哪一章
     for (var i = 1;i < navigationProcess.value.length; i++){
       if (lessThan(newValue, navigationProcess.value[i])){
-        currentSection.value = i-1
+        currentSection.value = (i - 1).toString()
         return
       }
     }
 
     // 最后一章
-    currentSection.value = navigationProcess.value.length - 1
+    currentSection.value = (navigationProcess.value.length - 1).toString()
   }
   findSection();
-  console.log(currentSection.value)
 })
 
+const prevSection = () => {
+  // 处于第一章
+  if (currentSection.value == '0'){
+    return
+  } else {
+    currentSection.value = (parseInt(currentSection.value) - 1).toString()
+    jumpTo(navigation.value[parseInt(currentSection.value)].href)
+  }
+}
 
+const nextSection = () => {
+  // 处于最后一章
+  if (currentSection.value == (navigationProcess.value.length - 1).toString()){
+    return
+  } else {
+    currentSection.value = (parseInt(currentSection.value) + 1).toString()
+    jumpTo(navigation.value[parseInt(currentSection.value)].href)
+  }
+}
 
 </script>
 
@@ -658,6 +678,8 @@ watch(process, async (newValue)=>{
 }
 
 .chapter-control-box{
+  margin-left: 8px;
+  margin-right: 8px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -694,5 +716,46 @@ watch(process, async (newValue)=>{
 
 .chapter-icon{
   fill: rgb(102,102,102);
+  cursor: pointer;
+}
+
+.range-bar{
+  flex-grow: 1;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.range-bar[type='range']::-webkit-slider-runnable-track{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 5px;
+  cursor:pointer;
+  border-radius:9999px;
+  background: -webkit-linear-gradient(rgb(188,188,188), rgb(188,188,188)) no-repeat,rgb(215,215,215);
+  background-size: var(--position) 100%;
+}
+
+.range-bar[type='range']::-webkit-slider-runnable-track:hover{
+  background: -webkit-linear-gradient(rgb(66,165,245), rgb(66,165,245)) no-repeat,rgb(188,188,188);
+}
+
+.range-bar[type='range']::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 6px;
+  width: 6px;
+  box-sizing: content-box;
+  border: 3px rgb(188,188,188) solid;
+  border-radius: 100%;
+  background: rgb(215,215,215);
+  transform: translate(0,-3px);
+}
+
+.range-bar[type='range']:hover::-webkit-slider-thumb{
+  background: white;
+  border-color: rgb(66,165,245);
 }
 </style>
