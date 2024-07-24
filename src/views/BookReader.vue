@@ -55,6 +55,22 @@
           <RecordIcon class="side-icon"/>   
           <div class="float"><span>笔记</span></div>
         </div>
+        <TBDivider direction="vertical" style="height: 60%;"/>
+        <p> 阅读模式</p>
+        <TBDivider direction="vertical" style="height: 60%;"/>
+        <div class="background-color-box">
+          <p>颜色</p>
+          <TBCheckBox
+            name="color"
+            v-for="(item, key) in backgroundColorList"
+            :key="key"
+            type="radio"
+            :color="item.color"
+            :value="key"
+            v-model="selectedColor"
+            :style="{border: `1px solid ${item.border}`}"
+          />
+        </div>
       </div>
     </transition>
   </Teleport>
@@ -78,11 +94,16 @@
           step="1" 
           v-model="process4bar" 
           :style="{'--position':process4bar.toString() + '%'}"
-          @mouseup="()=>{findPage(process4bar / 100)}"
+          @mouseup="()=>{findPage(process4bar / 100); displayProcessView=false}"
+          @mousedown="()=>{displayProcessView=true}"
         />
         <p class="process-tag" v-if="process">{{ process }}</p>
       </div>
     </transition>
+    <div class="darg-info-box" :style="{left:processBarPos + 6 +'px'}" v-if="loaded && displayProcessView">
+      <p>{{ process4bar }}%</p>
+      <p> {{ navigation[parseInt(findSection(process4bar + '%'))].label}}</p>
+    </div>
   </Teleport>
 
   
@@ -90,7 +111,7 @@
 
 <script setup>
 import Epub from "epubjs";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import TBDivider from "@/components/TBDivider.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
 import CatalogIcon from "@/assets/catalog.svg"
@@ -101,11 +122,11 @@ import MiniProgressBar from "@/components/MiniProgressBar.vue"
 import NextIcon from "@/assets/next.svg"
 import PrevIcon from "@/assets/prev.svg"
 import TBInput from "@/components/TBInput.vue";
+import TBCheckBox from "@/components/TBCheckBox.vue";
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
 const book = Epub(exampleBoolURL)
 console.log(book)
-const fontSize = ref(16)
 var rendition
 
 // 目录/笔记 控制
@@ -120,6 +141,58 @@ const navigationProcess = ref([])
 const process = ref('0.00%')
 const currentSection = ref('0')
 const process4bar = ref(0)
+const loaded = ref(false)
+
+// 进度预览控制
+const displayProcessView = ref(false)
+
+
+// 样式控制
+const backgroundColor = ref('white')
+const fontColor = ref('rgb(38,38,38)')
+const fontSize = ref(16)
+const lineSpace = ref(1.75)
+
+const style = computed(()=>{
+  return {
+    'html':{
+      'background': backgroundColor.value,
+      'color': fontColor.value
+    },
+    'body':{
+      'font-size': fontSize.value + 'px !important',
+      'line-height': (fontSize.value * lineSpace.value) + 'px !important',
+      'background': backgroundColor.value,
+    },
+    'p':{
+      'font-size': fontSize.value + 'px !important',
+      'line-height': (fontSize.value * lineSpace.value) + 'px !important'
+    }
+  }
+})
+
+// 背景颜色列表
+const backgroundColorList = ref([
+  {color:'rgb(252,252,252)', border:'rgb(215,215,215)'},
+  {color:'rgb(249,244,233)', border:'rgb(187,182,171)'},
+  {color:'rgb(206,234,186)', border:'rgb(164,235,160)'},
+  {color:'rgb(109,109,111)', border:'rgb(83,83,83)'},
+  {color:'rgb(83,83,83)', border:'rgb(74,74,74)'}
+])
+
+const selectedColor = ref(0)
+
+// 处理颜色变化
+watch(selectedColor,(newValue)=>{
+  backgroundColor.value = backgroundColorList.value[newValue]
+})
+
+// 更新样式
+watch(style,(newValue)=>{
+  console.log(1)
+  rendition.destroy()
+  initRendition(displayLeftBar.value);
+})
 
 // 格式化 process
 const formatProcess = (process) =>{
@@ -144,6 +217,7 @@ book.ready.then(()=>{
       )
     })
     console.log(navigationProcess.value)
+    loaded.value = true
   })
 })
 
@@ -217,6 +291,8 @@ const initRendition = (leftBar=true) => {
     }
     handleClick()
   })
+
+  rendition.themes.default(style.value)
 }
 
 initRendition(displayLeftBar.value);
@@ -278,31 +354,53 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
   initRendition(newValue);
 })
 
-// 处理目录高亮变化
-watch(process, async (newValue)=>{
-  const findSection = () => {
-    // console.log(newValue)
+const findSection = (p) => {
+    console.log(p)
     const lessThan = (arg1, arg2)=>{
       return Number(arg1.slice(0,arg1.length - 1)) < Number(arg2.slice(0,arg2.length - 1))
     }
     // 封面
-    if (lessThan(newValue,navigationProcess.value[0])){
-      currentSection.value = '0'
-      return
+    if (lessThan(p,navigationProcess.value[0])){
+      return '0'
     }
 
     // 找到属于哪一章
     for (var i = 1;i < navigationProcess.value.length; i++){
-      if (lessThan(newValue, navigationProcess.value[i])){
-        currentSection.value = (i - 1).toString()
-        return
+      if (lessThan(p, navigationProcess.value[i])){
+        return (i - 1).toString()
       }
     }
 
     // 最后一章
-    currentSection.value = (navigationProcess.value.length - 1).toString()
+    return (navigationProcess.value.length - 1).toString()
   }
-  findSection();
+
+
+// 处理目录高亮变化
+watch(process, async (newValue)=>{
+  // const findSection = () => {
+  //   // console.log(newValue)
+  //   const lessThan = (arg1, arg2)=>{
+  //     return Number(arg1.slice(0,arg1.length - 1)) < Number(arg2.slice(0,arg2.length - 1))
+  //   }
+  //   // 封面
+  //   if (lessThan(newValue,navigationProcess.value[0])){
+  //     currentSection.value = '0'
+  //     return
+  //   }
+
+  //   // 找到属于哪一章
+  //   for (var i = 1;i < navigationProcess.value.length; i++){
+  //     if (lessThan(newValue, navigationProcess.value[i])){
+  //       currentSection.value = (i - 1).toString()
+  //       return
+  //     }
+  //   }
+
+  //   // 最后一章
+  //   currentSection.value = (navigationProcess.value.length - 1).toString()
+  // }
+  currentSection.value = findSection(newValue);
 })
 
 const prevSection = () => {
@@ -327,10 +425,10 @@ const nextSection = () => {
 
 // 处理大进度条拖动
 const findPage = async (percentage)=>{
-  const pageLoc = parseInt(book.locations.total * percentage)
+  const pageLoc = parseInt(book.locations.total * percentage )
   const targetCFI = PageList.value[pageLoc]
-  console.log(targetCFI)
   jumpTo(targetCFI)
+  console.log(processBarPos)
 }
 
 
@@ -355,6 +453,18 @@ const findPage = async (percentage)=>{
 watch(process, (newValue)=>{
   process4bar.value = parseInt(newValue)
 })
+
+
+const processBarPos = computed(()=>{
+  var processBarDOM = document.querySelector('.range-bar')
+  if (!processBarDOM){return  process4bar.value}
+  const rect = processBarDOM.getBoundingClientRect()
+  const offsetX = rect.left
+  const barWidth = rect.width
+  const sliderPos = offsetX + barWidth/100 * process4bar.value
+  return sliderPos
+})
+
 </script>
 
 <style scoped>
@@ -443,6 +553,17 @@ watch(process, (newValue)=>{
   align-items: center;
   padding-left: 16px;
   gap:12px
+}
+
+#head-setting-panel p:nth-child(5){
+  margin: 0;
+  color: rgb(109,109,111);
+  font-size: 14px;
+  user-select: none;
+}
+
+#head-setting-panel input[type='radio']:checked::after{
+  opacity: 0;
 }
 
 .turn-page{
@@ -723,7 +844,7 @@ watch(process, (newValue)=>{
 
 .chapter-control-box{
   margin-left: 8px;
-  margin-right: 8px;
+  margin-right: 16px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -791,10 +912,10 @@ watch(process, (newValue)=>{
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  height: 6px;
-  width: 6px;
+  height: 8px;
+  width: 8px;
   box-sizing: content-box;
-  border: 3px rgb(188,188,188) solid;
+  border: 2px rgb(188,188,188) solid;
   border-radius: 100%;
   background: rgb(215,215,215);
   transform: translate(0,-3px);
@@ -811,5 +932,44 @@ watch(process, (newValue)=>{
   user-select: none;
   font-size: 12px;
   color: rgb(102,102,102)
+}
+
+.darg-info-box{
+  background: white;
+  position: absolute;
+  bottom: 36px;
+  transform: translate(-50%,0);
+  padding:8px 16px;
+  color:rgb(102,102,102);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.darg-info-box p{
+  margin:0;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  max-width: 160px;
+  white-space:nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.darg-info-box > p:first-child{
+  font-weight: 500;
+}
+
+.background-color-box{
+  margin: 0;
+  color: rgb(109,109,111);
+  font-size: 12px;
+  user-select: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px
 }
 </style>
