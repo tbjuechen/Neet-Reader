@@ -69,7 +69,18 @@
           <NextIcon class="chapter-icon" @click="nextSection"/>
         </div>
         <TBDivider direction="vertical" style="height: 60%;"/>
-        <input type="range" class="range-bar" min="0" max="100" step="1" v-model="process4bar" :style="{'--position':process4bar.toString() + '%'}"/>
+        <input 
+          ref="inputRef" 
+          type="range" 
+          class="range-bar" 
+          min="0" 
+          max="100" 
+          step="1" 
+          v-model="process4bar" 
+          :style="{'--position':process4bar.toString() + '%'}"
+          @mouseup="()=>{findPage(process4bar / 100)}"
+        />
+        <p class="process-tag" v-if="process">{{ process }}</p>
       </div>
     </transition>
   </Teleport>
@@ -115,7 +126,7 @@ const formatProcess = (process) =>{
   return (process * 100).toFixed(2) + '%'
 }
 
-
+const PageList = ref([])
 
 book.ready.then(()=>{
   // 加载目录
@@ -126,6 +137,7 @@ book.ready.then(()=>{
     750 * ((window.innerWidth - 460) / 375 * (fontSize/16))
   ).then((location)=>{
     console.log(location)
+    PageList.value = location
     navigation.value.forEach((item)=>{
       navigationProcess.value.push(
         formatProcess(book.locations.percentageFromCfi(book.spine.get(item.href).cfiFromRange(0)))
@@ -266,6 +278,7 @@ watch(displayLeftBar,async (newValue, oldValue)=>{
   initRendition(newValue);
 })
 
+// 处理目录高亮变化
 watch(process, async (newValue)=>{
   const findSection = () => {
     // console.log(newValue)
@@ -312,6 +325,36 @@ const nextSection = () => {
   }
 }
 
+// 处理大进度条拖动
+const findPage = async (percentage)=>{
+  const pageLoc = parseInt(book.locations.total * percentage)
+  const targetCFI = PageList.value[pageLoc]
+  console.log(targetCFI)
+  jumpTo(targetCFI)
+}
+
+
+// const inputRef = ref()
+
+// onMounted(()=>{
+//   inputRef.value.addEventListener("mouseup",()=>{findPage(process4bar.value / 100)})
+// })
+
+// // 被销毁后重新添加监听器
+// watch(displaySetting,(newValue)=>{
+//   if (newValue){
+//     setTimeout(()=>{
+//       const targetDOM = document.querySelector('.range-bar')
+//       console.log(targetDOM)
+//       targetDOM.addEventListener("mouseup",()=>{findPage(process4bar.value / 100)})
+//     },500)
+//   }
+// })
+
+// 大进度条跟随进度
+watch(process, (newValue)=>{
+  process4bar.value = parseInt(newValue)
+})
 </script>
 
 <style scoped>
@@ -675,6 +718,7 @@ const nextSection = () => {
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding-right: 16px;
 }
 
 .chapter-control-box{
@@ -724,6 +768,7 @@ const nextSection = () => {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  margin: 0 24px;
 }
 
 .range-bar[type='range']::-webkit-slider-runnable-track{
@@ -737,8 +782,9 @@ const nextSection = () => {
   background-size: var(--position) 100%;
 }
 
-.range-bar[type='range']::-webkit-slider-runnable-track:hover{
+.range-bar[type='range']:hover::-webkit-slider-runnable-track{
   background: -webkit-linear-gradient(rgb(66,165,245), rgb(66,165,245)) no-repeat,rgb(188,188,188);
+  background-size: var(--position) 100%;
 }
 
 .range-bar[type='range']::-webkit-slider-thumb{
@@ -757,5 +803,13 @@ const nextSection = () => {
 .range-bar[type='range']:hover::-webkit-slider-thumb{
   background: white;
   border-color: rgb(66,165,245);
+}
+
+.process-tag{
+  margin: 0;
+  text-align: center;
+  user-select: none;
+  font-size: 12px;
+  color: rgb(102,102,102)
 }
 </style>
