@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" :style="{'background': backgroundColor}">
     <transition name="left-bar">
       <div class="left-contianer bordered" v-if="displayLeftBar">
         <div id="catalog" v-if="displayCatalog">
@@ -43,6 +43,8 @@
       </transition>
     </div>
   </div>
+  
+  <!-- 顶部设置栏 -->
   <Teleport to="body">
     <transition name="setting-panel">
       <div id="head-setting-panel" class="bordered" v-if="displaySetting">
@@ -70,6 +72,39 @@
             v-model="selectedColor"
             :style="{border: `1px solid ${item.border}`}"
           />
+        </div>
+        <div class="font-size-box">
+          <p>字号</p>
+          <MinusCircle @click="FontSizeMinus"/>
+          <p>{{ fontSize }}</p>
+          <PlusCircle @click="FontSizePlus"/>
+        </div>
+        <TBDivider direction="vertical" style="height: 60%;"/>
+        <div class="more-setting-box">
+          <SettingIcon/>
+          <span>更多设置</span>
+        </div>
+        <div class="right-icon-box">
+          <div class="side-buttom-box" >
+            <BookMarkIcon class="side-icon right-icon"/>   
+            <div class="float" style="--xtrans: -7px"><span>添加书签</span></div>
+          </div>
+          <div class="side-buttom-box" >
+            <DownArrow2 class="side-icon right-icon"/>   
+            <div class="float" style="--xtrans: -7px"><span>更多书签</span></div>
+          </div>
+          <div class="side-buttom-box" >
+            <SearchIcon class="side-icon right-icon" style="transform: scaleX(-1);"/>   
+            <div class="float" style="--xtrans: 0"><span>搜索</span></div>
+          </div>
+          <div class="side-buttom-box" >
+            <FullScreenIcon class="side-icon right-icon"/>   
+            <div class="float" style="--xtrans: 0"><span>全屏</span></div>
+          </div>
+          <div class="side-buttom-box" @click="changeDisplay">
+            <DownArrow class="side-icon right-icon" style="transform: rotate(180deg) translate(0, 3px); width: 24px; height: 24px;"/>   
+            <div class="float" style="--xtrans: 4px"><span>收起</span></div>
+          </div>
         </div>
       </div>
     </transition>
@@ -106,6 +141,42 @@
     </div>
   </Teleport>
 
+  <!-- 设置栏更多设置面板 -->
+  <Teleport to="body">
+    <div class="bordered setting-box">
+      <div class="bordered sub-setting-box">
+        <p>字体</p>
+        <div class="radio-group">
+          <div class="checkbox-label" v-for="item,index in fontFamilyList" :key="item.name">
+            <input type="radio" name="font-family" v-model="selectedFont" :value="index" :id="item.name"/>
+            <label :for="item.name">{{ item.name }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="bordered sub-setting-box">
+        <p>文字加粗</p>
+        <div class="radio-group">
+          <div class="checkbox-label">
+            <input type="radio" name="font-weight" id="open" :value="true" v-model="isbold">
+            <label for="open"> 开启 </label>
+          </div>
+          <div class="checkbox-label">
+            <input type="radio" name="font-weight" id="close" :value="false" v-model="isbold">
+            <label for="close"> 关闭 </label>
+          </div>
+        </div>
+      </div>
+      <div class="bordered sub-setting-box">
+        <p>行间距</p>
+        <div class="radio-group">
+          <div class="checkbox-label" v-for="item,index in lineSpaceList" :key="index">
+            <input type="radio" name="line-space" :id="item" :value="item" v-model="lineSpace"/>
+            <label :for="item">{{ item }}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
   
 </template>
 
@@ -123,6 +194,18 @@ import NextIcon from "@/assets/next.svg"
 import PrevIcon from "@/assets/prev.svg"
 import TBInput from "@/components/TBInput.vue";
 import TBCheckBox from "@/components/TBCheckBox.vue";
+// 字体大小控制
+import MinusCircle from "@/assets/minusCircle.svg"
+import PlusCircle from "@/assets/plusCircle.svg"
+// 设置
+import SettingIcon from "@/assets/setting.svg"
+// 全屏
+import FullScreenIcon from "@/assets/fullScreen.svg"
+// 搜索
+import SearchIcon from "@/assets/search.svg"
+// 书签
+import DownArrow2 from "@/assets/downArrow-3.svg"
+import BookMarkIcon from "@/assets/bookMark.svg"
 
 const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
 const book = Epub(exampleBoolURL)
@@ -151,7 +234,28 @@ const displayProcessView = ref(false)
 const backgroundColor = ref('white')
 const fontColor = ref('rgb(38,38,38)')
 const fontSize = ref(16)
-const lineSpace = ref(1.75)
+// const lineSpace = ref(1.75)
+const fontFamilyList = [
+  { family:'"黑体", "Heiti SC", "Blod"', name:'黑体' },
+  { family:'"SimSun", "宋体", serif', name:'宋体' },
+  { family:'"楷体", SimSun, "Sunflower", sans-serif', name:'楷体'},
+  { family:'"幼圆", "Arial", sans-serif', name:'幼圆'}
+]
+const selectedFont = ref(0)
+
+const fontFamily = computed(()=>{
+  return fontFamilyList[selectedFont.value].family
+})
+
+const isbold = ref(false)
+const fontWeight = computed(()=>{
+  return isbold.value?700:500
+})
+
+const lineSpaceList = [
+  '1.0','1.2','1.5','1.75','2.0'
+]
+const lineSpace = ref('1.75')
 
 const style = computed(()=>{
   return {
@@ -161,8 +265,10 @@ const style = computed(()=>{
     },
     'body':{
       'font-size': fontSize.value + 'px !important',
-      'line-height': (fontSize.value * lineSpace.value) + 'px !important',
+      'line-height': (fontSize.value * parseFloat(lineSpace.value)) + 'px !important',
       'background': backgroundColor.value,
+      'font-family': fontFamily.value,
+      'font-weight': fontWeight.value
     },
     'p':{
       'font-size': fontSize.value + 'px !important',
@@ -184,15 +290,28 @@ const selectedColor = ref(0)
 
 // 处理颜色变化
 watch(selectedColor,(newValue)=>{
-  backgroundColor.value = backgroundColorList.value[newValue]
+  backgroundColor.value = backgroundColorList.value[newValue].color
 })
 
 // 更新样式
 watch(style,(newValue)=>{
-  console.log(1)
   rendition.destroy()
   initRendition(displayLeftBar.value);
 })
+
+// 处理字号改变
+const FontSizeMinus = () => {
+  if (fontSize.value > 10) {
+    fontSize.value--
+  }
+}
+
+const FontSizePlus = () => {
+  if (fontSize.value < 30) {
+    fontSize.value++
+  }
+}
+
 
 // 格式化 process
 const formatProcess = (process) =>{
@@ -646,7 +765,7 @@ const processBarPos = computed(()=>{
 
 .float{
   position: absolute;
-  width: 48px;
+  min-width: 48px;
   height: 32px;
   background: rgba(24,24,24,0.8);
   top: 40px;
@@ -657,12 +776,14 @@ const processBarPos = computed(()=>{
   align-items: center;
   color:rgb(251,251,251);
   opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.2s;
+  transform: translate(var(--xtrans), 0) scale(0.5) !important;
+  transition: all 0.2s !important;
 }
 
 .float span{
   font-size: 14px;
+  white-space: nowrap;
+  padding: 0 4px;
 }
 
 .float::after{
@@ -685,7 +806,7 @@ const processBarPos = computed(()=>{
 
 .side-buttom-box:hover .float{
   opacity: 1;
-  transform: scale(1);
+  transform: translate(var(--xtrans), 0) scale(1) !important;
 }
 
 .left-bar-enter-active,
@@ -736,9 +857,9 @@ const processBarPos = computed(()=>{
   width: 40px;
   height: 40px;
   top: 0px;
-  border: rgb(255,255,255) solid 1px;
+  border: rgba(255,255,255,0) solid 1px;
   display: flex;
-  justify-content: center;
+  justify-content: center; 
   align-items: center;
   transition: all 0.4s;
 }
@@ -971,5 +1092,110 @@ const processBarPos = computed(()=>{
   align-items: center;
   justify-content: center;
   gap: 6px
+}
+
+.font-size-box{
+  font-size: 12px;
+  user-select: none;
+  color: rgb(109,109,111);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.font-size-box svg{
+  fill:rgb(85,85,85);
+  cursor: pointer;
+  height: 18px;
+  width: 18px;
+}
+
+.font-size-box svg:hover{
+  fill: black;
+}
+
+.more-setting-box{
+  font-size: 12px;
+  user-select: none;
+  color: rgb(109,109,111);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.more-setting-box svg{
+  fill:rgb(85,85,85);
+  height: 18px;
+  width: 18px;
+}
+
+.more-setting-box:hover svg{
+  fill: black;
+}
+
+.right-icon-box{
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 24px;
+  gap: 10px;
+}
+
+.right-icon{
+  height: 16px;
+  width: 16px;
+}
+
+.setting-box{
+  position: absolute;
+  top: 41px;
+  left: 580px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  color: rgb(109,109,111);
+  /* width: 500px; */
+}
+
+.setting-box p{
+  margin: 0;
+}
+
+.sub-setting-box{
+  width: 100%;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.radio-group{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+}
+
+.checkbox-label label{
+  text-align: center;
+}
+
+.checkbox-label{
+  display: flex;
+  align-items: center;
+  min-width: 60px;
+  gap: 4px;
 }
 </style>
