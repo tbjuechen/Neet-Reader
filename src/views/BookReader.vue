@@ -336,6 +336,7 @@ book.ready.then(()=>{
       )
     })
     console.log(navigationProcess.value)
+    initRendition(displayLeftBar.value);
     loaded.value = true
   })
 })
@@ -345,17 +346,27 @@ book.ready.then(()=>{
 const jumpTo = (herf)=>{
   rendition.display(herf).then(()=>{
     process.value = formatProcess(rendition.currentLocation().start.percentage)
+    currentCFI.value = rendition.currentLocation().start.cfi
+    console.log(currentCFI.value)
   })
 }
 
 // 翻页
 const prevPage = (e) => {
-  rendition.prev().then(()=>{process.value = formatProcess(rendition.currentLocation().start.percentage)});
+  rendition.prev().then(()=>{
+    process.value = formatProcess(rendition.currentLocation().start.percentage)
+    currentCFI.value = rendition.currentLocation().start.cfi
+    console.log(currentCFI.value)
+  });
   e.stopPropagation();
 }
 
 const nextPage = (e) => {
-  rendition.next().then(()=>{process.value = formatProcess(rendition.currentLocation().start.percentage)});
+  rendition.next().then(()=>{
+    process.value = formatProcess(rendition.currentLocation().start.percentage)
+    currentCFI.value = rendition.currentLocation().start.cfi
+    console.log(currentCFI.value)
+  });
   e.stopPropagation();
 }
 
@@ -382,6 +393,7 @@ const handleClick = () => {
   }
 }
 
+var rendition
 // 将书本挂载到 read 上
 const initRendition = (leftBar=true) => {
   rendition = book.renderTo("read",{
@@ -392,6 +404,9 @@ const initRendition = (leftBar=true) => {
   rendition.spread('auto', 640)
   rendition.display().then(()=>{
     process.value = formatProcess(rendition.currentLocation().start.percentage)
+    if (currentCFI.value){
+      jumpTo(currentCFI.value)
+    }
   })
 
   rendition.on('mousedown',(event) =>{
@@ -414,7 +429,7 @@ const initRendition = (leftBar=true) => {
   rendition.themes.default(style.value)
 }
 
-initRendition(displayLeftBar.value);
+// initRendition(displayLeftBar.value);
 
 
 // 我也不知道为啥挂载完时并没有 currentLaocation 官方文档就是屎
@@ -429,12 +444,23 @@ initRendition(displayLeftBar.value);
 // }
 // getProcess()
 
+
+const currentCFI = ref(null)
 // 窗口变化时重新挂载阅读器
 onMounted(()=>{
   window.onresize = ()=>{
+    // var lastCFI 
+    // try{
+    //   lastCFI = rendition.currentLocation().start.cfi
+    // }catch(e){
+    //   lastCFI = null
+    // }
+    // currentCFI.value = lastCFI?lastCFI:currentCFI.value
+    // console.log(lastCFI, currentCFI.value)
     // 可能需要防抖
     rendition.destroy()
     initRendition(displayLeftBar.value);
+    // jumpTo(currentCFI.value)
   }
 })
 
