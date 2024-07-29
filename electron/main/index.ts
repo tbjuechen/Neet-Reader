@@ -3,6 +3,8 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
+import {addBook} from './envinit'
+import { readFile } from './file'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -144,4 +146,12 @@ ipcMain.on('maximize-win', () => {
   }
 })
 
+ipcMain.handle('create-book', (_, book_path:string)=> {
+  addBook(book_path, 'default')
+})
+
+
+ipcMain.handle('read-file', async (_, file_path:string):Promise<ArrayBuffer> => {
+  return await readFile(file_path)
+})
 

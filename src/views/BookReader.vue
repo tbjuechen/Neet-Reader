@@ -80,7 +80,7 @@
           <PlusCircle @click="FontSizePlus"/>
         </div>
         <TBDivider direction="vertical" style="height: 60%;"/>
-        <div class="more-setting-box">
+        <div class="more-setting-box" @click="handleClickSetting">
           <SettingIcon/>
           <span>更多设置</span>
         </div>
@@ -143,7 +143,7 @@
 
   <!-- 设置栏更多设置面板 -->
   <Teleport to="body">
-    <div class="bordered setting-box">
+    <div class="bordered setting-box" v-if="displaySettingPanel">
       <div class="bordered sub-setting-box">
         <p>字体</p>
         <div class="radio-group">
@@ -312,6 +312,12 @@ const FontSizePlus = () => {
   }
 }
 
+// 设置面板显示控制
+const displaySettingPanel = ref(false)
+
+const handleClickSetting = () => {
+  displaySettingPanel.value = !displaySettingPanel.value
+}
 
 // 格式化 process
 const formatProcess = (process) =>{
@@ -424,6 +430,7 @@ const initRendition = (leftBar=true) => {
       y:event.clientY
     }
     handleClick()
+    displaySettingPanel.value = false
   })
 
   rendition.themes.default(style.value)
@@ -1223,5 +1230,9 @@ const processBarPos = computed(()=>{
   align-items: center;
   min-width: 60px;
   gap: 4px;
+}
+
+.float{
+  z-index: 100;
 }
 </style>

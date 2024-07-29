@@ -3,11 +3,7 @@
     <LogoIcon class="icon-logo" />
     <TBButton
       id="add-book-button"
-      @click="
-        () => {
-          console.log('2');
-        }
-      "
+      @click="createBook"
     >
       添加图书
     </TBButton>
@@ -153,6 +149,7 @@ import TBFloatBox from "./TBFloatBox.vue";
 import TBInput from "./TBInput.vue";
 import TBCheckBox from "./TBCheckBox.vue";
 import openDialog from "@/core/dialog.js";
+import Epub from "epubjs";
 
 const color_dict = {
   gray: "rgb(158,158,158)",
@@ -346,6 +343,23 @@ const handelConfirmCreate = () => {
   // 和后端同步
   distoryCreatePanel();
 };
+
+const createBook = async () => {
+  const bookData = await window.ipcRenderer.invoke("read-file","F:\\Scripts\\electron-vite-vue\\public\\example\\13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub");
+  const book = Epub(bookData.buffer);
+  await book.ready
+  // 提取封面
+  const resources = book.resources;  
+  const items = await resources.replacements()
+  const coverIndex = resources.urls.indexOf("Images/cover.jpg")
+  const coverURL = items[coverIndex]
+  console.log(coverURL)
+  const response = await fetch(coverURL);
+  const arrayBuffer = await response.arrayBuffer();
+  console.log(arrayBuffer)
+  // window.ipcRenderer.invoke("create-book","F:\\Scripts\\electron-vite-vue\\public\\example\\13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub");
+};
+
 </script>
 
 
