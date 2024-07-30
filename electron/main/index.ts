@@ -3,7 +3,7 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
-import {addBook} from './envinit'
+import { addBook, initUserDataPath } from './store'
 import { readFile } from './file'
 
 const require = createRequire(import.meta.url)
@@ -39,6 +39,9 @@ if (!app.requestSingleInstanceLock()) {
   app.quit()
   process.exit(0)
 }
+
+// 用户文件夹初始化检查
+initUserDataPath();
 
 let win: BrowserWindow | null = null
 const preload = path.join(__dirname, '../preload/index.mjs')
@@ -146,8 +149,8 @@ ipcMain.on('maximize-win', () => {
   }
 })
 
-ipcMain.handle('create-book', (_, book_path:string)=> {
-  addBook(book_path, 'default')
+ipcMain.handle('create-book', (_, book_path:string, cover:ArrayBuffer, catalog:string='default')=> {
+  addBook(book_path, cover, catalog)
 })
 
 
