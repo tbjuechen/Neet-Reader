@@ -22,8 +22,7 @@
           height: '8px',
           marginRight: '12px',
           marginTop: '2px',
-          stroke: item.color,
-          fill: item.color,
+          fill: `${color_dict[item.filled]}`,
         }"
       />
       <p class="item-text">{{ item.name }}</p>
@@ -166,17 +165,22 @@ const book_shelf_items = ref([
   { name: "分类二", filled: "green" },
 ]);
 
+window.ipcRenderer.invoke("get-catalog-list").then((res) => {
+  console.log(res);
+  book_shelf_items.value = res
+});
+
 const cloud_item = ref({
   name: "云端存储",
   isSelect: false,
 });
 
-book_shelf_items.value.forEach((item) => {
-  if (item.filled) {
-    item.color = color_dict[item.filled];
-  }
-  item.isSelect = false;
-});
+// book_shelf_items.value.forEach((item) => {
+//   if (item.filled) {
+//     item.color = color_dict[item.filled];
+//   }
+//   item.isSelect = false;
+// });
 
 const handleSwich = (item) => {
   book_shelf_items.value.forEach((item) => {
@@ -278,12 +282,19 @@ const handleConfirmEdit = () => {
       flag = true;
       book_shelf_items.value[last_click_item].filled =
         color_list.value[selected_color.value].name;
-      book_shelf_items.value[last_click_item].color =
-        color_list.value[selected_color.value].color;
     }
   }
   // 和后端同步
-
+  if (flag) {
+    window.ipcRenderer
+      .invoke(
+        "update-catalog",
+        JSON.stringify(book_shelf_items.value[last_click_item]),
+      )
+      .then((res) => {
+        console.log(res);
+      });
+  }
   distoryEditPanel();
 };
 
@@ -294,6 +305,10 @@ const handleClickDelete = (e) => {
   const item = book_shelf_items.value[last_click_item];
   const message = "确认删除分类“" + item.name + "”吗？";
   const accept = () => {
+    // 同步
+    window.ipcRenderer.invoke("delete-catalog", item.uuid).then((res) => {
+      console.log(res);
+    });
     // 删除分类
     book_shelf_items.value.splice(last_click_item, 1);
   };
@@ -341,6 +356,9 @@ const handelConfirmCreate = () => {
   console.log(new_catalog);
   book_shelf_items.value.push(new_catalog);
   // 和后端同步
+  window.ipcRenderer.invoke("create-catalog", new_catalog.name, new_catalog.filled).then((res) => {
+    console.log(res);
+  });
   distoryCreatePanel();
 };
 

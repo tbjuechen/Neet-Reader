@@ -3,7 +3,8 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
-import { addBook, initUserDataPath } from './store'
+import { addBook, initUserDataPath, createCatalog, catalogColor, readCatalog, 
+  catalog, updateCatalog, deleteCatalog } from './store'
 import { readFile } from './file'
 
 const require = createRequire(import.meta.url)
@@ -149,12 +150,28 @@ ipcMain.on('maximize-win', () => {
   }
 })
 
-ipcMain.handle('create-book', (_, book_path:string, cover:ArrayBuffer, catalog:string='default')=> {
-  addBook(book_path, cover, catalog)
+ipcMain.handle('create-book', async (_, book_path:string, cover:ArrayBuffer, catalog:string='default')=> {
+  return await addBook(book_path, cover, catalog)
 })
-
 
 ipcMain.handle('read-file', async (_, file_path:string):Promise<ArrayBuffer> => {
   return await readFile(file_path)
 })
 
+ipcMain.handle('create-catalog', async (_, catalog_name:string, color:catalogColor):Promise<string> => {
+  return await createCatalog(catalog_name, color)
+})
+
+ipcMain.handle('get-catalog-list', async (_) => {
+  return await readCatalog()
+})
+
+ipcMain.handle('update-catalog', async (_, newCatalog: string) => {
+  var newCatalogOBJ:catalog = JSON.parse(newCatalog)
+  delete newCatalogOBJ['isSelect'] // 清除前端添加的isSelect属性
+  return await updateCatalog(newCatalogOBJ)
+})
+
+ipcMain.handle('delete-catalog', async (_, catalog_uuid: string) => {
+  return await deleteCatalog(catalog_uuid)
+})

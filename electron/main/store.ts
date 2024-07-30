@@ -8,10 +8,13 @@ const BOOKSPATH:string = path.join(USERDATAFILEPATH, 'books_store')
 const SHELFPATH:string = path.join(USERDATAFILEPATH, 'shelf_store')
 const CATALOGPATH:string = path.join(SHELFPATH, 'catalog')
 
+type catalogColor = 'gray'|'blue'|'green'|'purple'|'orange'|'red'
+
 interface catalog{
   name: string,
   uuid: string,
   books: Array<string>
+  filled?: catalogColor
 }
 
 interface book {
@@ -61,12 +64,13 @@ async function writeCatalog(newCatalog:Array<catalog>):Promise<boolean>{
 }
 
 // 创建新书架
-async function createCatalog(catalog_name:string):Promise<string>{
+async function createCatalog(catalog_name:string, color:catalogColor):Promise<string>{
   const catalog_uuid:string = uuidv4() 
   var catalog_info:catalog = {
     name: catalog_name,
     uuid: catalog_uuid,
-    books: []
+    books: [],
+    filled: color
   }
   var catalogLsit:Array<catalog> = await readCatalog()
   catalogLsit.push(catalog_info)
@@ -90,14 +94,15 @@ async function findCatalog(uuid:string, catalogList:Array<catalog> | null = null
 // 通过uuid更新分类
 async function updateCatalog(newCatalog:catalog):Promise<boolean> {
   try{
-    var catalogList = await readCatalog()
-    const targetIndex = catalogList.findIndex((item:catalog)=>{ item.uuid === newCatalog.uuid})
+    var catalogList:Array<catalog> = await readCatalog()
+    const targetIndex = catalogList.findIndex((item:catalog)=>{ return item.uuid === newCatalog.uuid})
     if (targetIndex === -1){
       throw Error('Catalog not found')
     }
     catalogList[targetIndex] = newCatalog
     return await writeCatalog(catalogList)
   } catch (e) {
+    console.log(e)
     return false
   }
 }
@@ -143,4 +148,22 @@ async function addBook(book_path:string, cover:ArrayBuffer, catalog_uuid:string=
   return book_uuid
 }
 
-export {initUserDataPath, createCatalog, addBook}
+// 删除分类
+async function deleteCatalog(catalog_uuid:string):Promise<boolean>{
+  try{
+    var catalogList:Array<catalog> = await readCatalog()
+    const targetIndex = catalogList.findIndex((item:catalog)=>{ return item.uuid === catalog_uuid})
+    if (targetIndex === -1){
+      throw Error('Catalog not found')
+    }
+    catalogList.splice(targetIndex, 1)
+    return await writeCatalog(catalogList)
+  } catch (e) {
+    console.log(e)
+    return false
+  }
+}
+
+export { initUserDataPath, createCatalog, addBook, 
+  catalogColor, readCatalog, catalog, book, updateCatalog,
+  deleteCatalog }
