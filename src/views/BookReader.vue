@@ -206,10 +206,11 @@ import SearchIcon from "@/assets/search.svg"
 // 书签
 import DownArrow2 from "@/assets/downArrow-3.svg"
 import BookMarkIcon from "@/assets/bookMark.svg"
+import { useRoute } from "vue-router";
 
-const exampleBoolURL = '/example/13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub'
-const book = Epub(exampleBoolURL)
-console.log(book)
+// 加载书籍
+const route = useRoute();
+var book
 var rendition
 
 // 目录/笔记 控制
@@ -326,26 +327,33 @@ const formatProcess = (process) =>{
 
 const PageList = ref([])
 
-book.ready.then(()=>{
-  // 加载目录
-  navigation.value = book.navigation.toc
-  
-  // 分页
-  book.locations.generate(
-    750 * ((window.innerWidth - 460) / 375 * (fontSize/16))
-  ).then((location)=>{
-    console.log(location)
-    PageList.value = location
-    navigation.value.forEach((item)=>{
-      navigationProcess.value.push(
-        formatProcess(book.locations.percentageFromCfi(book.spine.get(item.href).cfiFromRange(0)))
-      )
+// 加载书本
+window.ipcRenderer.invoke('read-book', route.params.id).then((res)=>{
+  book = new Epub(res.buffer)
+  console.log(book)
+  book.ready.then(()=>{
+    // 加载目录
+    navigation.value = book.navigation.toc
+    
+    // 分页
+    book.locations.generate(
+      750 * ((window.innerWidth - 460) / 375 * (fontSize/16))
+    ).then((location)=>{
+      console.log(location)
+      PageList.value = location
+      navigation.value.forEach((item)=>{
+        navigationProcess.value.push(
+          formatProcess(book.locations.percentageFromCfi(book.spine.get(item.href).cfiFromRange(0)))
+        )
+      })
+      console.log(navigationProcess.value)
+      initRendition(displayLeftBar.value);
+      loaded.value = true
     })
-    console.log(navigationProcess.value)
-    initRendition(displayLeftBar.value);
-    loaded.value = true
   })
 })
+
+
 
 
 // 跳转到指定目录
@@ -399,7 +407,6 @@ const handleClick = () => {
   }
 }
 
-var rendition
 // 将书本挂载到 read 上
 const initRendition = (leftBar=true) => {
   rendition = book.renderTo("read",{

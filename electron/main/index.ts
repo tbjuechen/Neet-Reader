@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
 import { addBook, initUserDataPath, createCatalog, catalogColor, readCatalog, 
-  catalog, updateCatalog, deleteCatalog, findCatalog, readBookInfo } from './store'
+  catalog, updateCatalog, deleteCatalog, findCatalog, readBookInfo, readBook } from './store'
 import { readFile } from './file'
 
 const require = createRequire(import.meta.url)
@@ -189,4 +189,10 @@ ipcMain.handle('get-cover', async (_, book_uuid: string):Promise<ArrayBuffer> =>
   const coverPath:string = path.join(bookStorePath, 'cover.jpg')
   return await readFile(coverPath)
 })
+
+ipcMain.handle('read-book', async (_, book_uuid: string):Promise<ArrayBuffer> => {
+  return await readBook(book_uuid)
+})
+
+
 

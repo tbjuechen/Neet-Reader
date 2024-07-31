@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 const APPDATA:string = process.env.APPDATA
 const USERDATAFILEPATH:string = path.join(APPDATA, 'NeetReader')
 const BOOKSPATH:string = path.join(USERDATAFILEPATH, 'books_store')
-process.env.BOOKSPATH = BOOKSPATH
+process.env.BOOKSPATH = BOOKSPATH // 加入环境变量
 const SHELFPATH:string = path.join(USERDATAFILEPATH, 'shelf_store')
 const CATALOGPATH:string = path.join(SHELFPATH, 'catalog')
 
@@ -173,6 +173,17 @@ async function readBookInfo(book_uuid:string):Promise<book>{
   return bookInfo
 }
 
+// 读取书籍文件
+async function readBook(book_uuid:string):Promise<ArrayBuffer>{
+  const bookInfo:book = await readBookInfo(book_uuid)
+  const bookStorePath:string = path.join(BOOKSPATH, book_uuid)
+  const bookPath:string = path.join(bookStorePath, bookInfo.name +'.epub')
+  const data:ArrayBuffer = await fs.promises.readFile(bookPath)
+  bookInfo.lastRead = new Date()
+  await fs.promises.writeFile(path.join(bookStorePath, 'info.json'), JSON.stringify(bookInfo), 'utf-8')
+  return data
+}
+
 export { initUserDataPath, createCatalog, addBook, 
   catalogColor, readCatalog, catalog, book, updateCatalog,
-  deleteCatalog, findCatalog, readBookInfo }
+  deleteCatalog, findCatalog, readBookInfo, readBook }

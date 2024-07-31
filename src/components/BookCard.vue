@@ -1,6 +1,8 @@
 <template>
   <div class="book-card-box">
-    <p v-if="data.last_visit" class="book-last-visit">{{ data.last_visit }}</p>
+    <div v-if="data.last_visit" id="new-create">
+      <p class="book-last-visit">{{ data.last_visit }}</p>
+    </div>
     <div v-else id="new-create">
       <div class="dot" style="margin-right: 8px" />
       <p class="book-last-visit">新添加</p>
@@ -69,14 +71,15 @@ window.ipcRenderer.invoke("read-book-info", props.book_id).then(async (res) => {
   const coverBlob = new Blob([coverData], { type: "image/jpeg" });
   data.value.cover = URL.createObjectURL(coverBlob);
   data.value.title = res.name;
-  data.value.last_visit = timeParse(res.last_visit);
+  console.log(res.lastRead);
+  data.value.last_visit = timeParse(res.lastRead);
 });
 
 // is checked
 const isChecked = ref(false);
 
 const handleClickBook = () =>{
-  window.ipcRenderer.invoke("open-win",'123')
+  window.ipcRenderer.invoke("open-win",props.book_id)
 }
 
 </script>
@@ -101,6 +104,8 @@ const handleClickBook = () =>{
   user-select: none;
   color: rgb(158, 158, 158);
   display: inline-block;
+  text-align: center;
+  line-height: 11px;
 }
 
 .dot {
@@ -200,5 +205,9 @@ const handleClickBook = () =>{
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#new-create{
+  height: 16px;
 }
 </style>
