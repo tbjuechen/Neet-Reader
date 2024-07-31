@@ -40,10 +40,10 @@
     </div>
     <div class="book-grid-box">
       <BookCard
-        v-for="(item, key) in bookList"
-        :book_id="item"
-        :key="key"
-        v-model="check_list[key]"
+        v-for="(item, key) in displayBookList"
+        :book_id="item.uuid"
+        :key="item.uuid"
+        v-model="item.isSelect"
         :select_mode="select_mode"
       ></BookCard>
     </div>
@@ -83,23 +83,47 @@ const data = ref({
   size: null,
 });
 
+const sortByTime = ref(true);
+const sortByName = ref(false);
+
 const bookList = ref([]);
-const check_list = ref([]);
+const displayBookList = ref([]);
 
 watch(()=>route.params.id, async (newVal, oldVal) => {
   currentCatalog = await window.ipcRenderer.invoke("find-catalog", newVal);
   data.value.name = currentCatalog.name;
   data.value.size = currentCatalog.books.length;
   bookList.value = [];
-  check_list.value = [];
-  currentCatalog.books.forEach(async (book) => {
-    bookList.value.push(book);
-    check_list.value.push(false);
-  });
+  displayBookList.value = [];
+  await Promise.all(currentCatalog.books.map(async (book) => {
+    const bookInfo = await window.ipcRenderer.invoke("read-book-info", book);
+    bookList.value.push(bookInfo);
+    bookInfo.isSelect = false;
+    displayBookList.value.push(bookInfo);
+  }));
+  if (sortByName.value) {
+    sortByNameFunc();
+  } else if (sortByTime.value) {
+    sortByTimeFunc();
+  }
 }, {immediate: true});
-// console.log(currentCatalogUUID.value);
 
+const sortByNameFunc = () => {
+  displayBookList.value.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  });
+};
 
+const sortByTimeFunc = () => {
+  console.log(displayBookList.value.sort((a, b) => {
+    // console.log(new Date(a.lastRead), new Date(b.lastRead));
+    const aDate = new Date(a.lastRead);
+    const bDate = new Date(b.lastRead);
+    console.log(aDate, bDate);
+    return aDate - bDate;
+  }));
+  console.log(displayBookList.value);
+};
 
 // const print = () => {
 //     console.log(check_list.value)
@@ -109,20 +133,20 @@ watch(()=>route.params.id, async (newVal, oldVal) => {
 // print()
 
 const select_mode = computed(() => {
-  return check_list.value.some((item) => item === true);
+  return displayBookList.value.some((item) => item.isSelect === true);
 });
 
 const select_all = computed(() => {
-  return check_list.value.every((item) => item === true);
+  return displayBookList.value.every((item) => item.isSelect === true);
 });
 
 const select_text = ref("");
 
 const handleSelectChange = (e) => {
   if (e.target.checked) {
-    check_list.value.forEach((item, index, arr) => (arr[index] = true));
+    displayBookList.value.forEach((item, index, arr) => (arr[index].isSelect = true));
   } else {
-    check_list.value.forEach((item, index, arr) => (arr[index] = false));
+    displayBookList.value.forEach((item, index, arr) => (arr[index].isSelect = false));
   }
 };
 
@@ -149,11 +173,11 @@ const handleSort = (e) => {
   console.log(sortByName.value, sortByTime.value);
 };
 
-const sortByTime = ref(true);
-const sortByName = ref(false);
+
 
 const handleClickTime = (e) => {
   sortByTime.value = true;
+  sortByTimeFunc();
   sortByName.value = false;
   e.stopPropagation();
 };
@@ -161,6 +185,7 @@ const handleClickTime = (e) => {
 const handleClickName = (e) => {
   sortByTime.value = false;
   sortByName.value = true;
+  sortByNameFunc();
   e.stopPropagation();
 };
 
@@ -246,6 +271,7 @@ p {
   padding-top: 24px;
   padding-left: 54px;
   padding-right: 30px;
+  padding-bottom: 24px ;
   box-sizing: border-box;
   overflow: auto;
 }

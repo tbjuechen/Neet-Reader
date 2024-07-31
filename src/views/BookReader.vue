@@ -354,8 +354,6 @@ window.ipcRenderer.invoke('read-book', route.params.id).then((res)=>{
 })
 
 
-
-
 // 跳转到指定目录
 const jumpTo = (herf)=>{
   rendition.display(herf).then(()=>{

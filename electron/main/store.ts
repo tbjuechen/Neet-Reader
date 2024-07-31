@@ -24,7 +24,7 @@ interface book {
   lastRead: null | Date
 }
 
-function initUserDataPath():void{
+async function initUserDataPath():Promise<void>{
   // 创建用户数据目录
   if (!fs.existsSync(USERDATAFILEPATH)){
     fs.mkdirSync(USERDATAFILEPATH)

@@ -353,28 +353,38 @@ const handelConfirmCreate = () => {
     filled: color_list.value[selected_color.value].name,
     color: color_list.value[selected_color.value].color,
   };
-  console.log(new_catalog);
-  book_shelf_items.value.push(new_catalog);
   // 和后端同步
   window.ipcRenderer.invoke("create-catalog", new_catalog.name, new_catalog.filled).then((res) => {
-    console.log(res);
+    new_catalog.uuid = res;
+    book_shelf_items.value.push(new_catalog);
   });
   distoryCreatePanel();
 };
 
 const createBook = async () => {
-  const bookData = await window.ipcRenderer.invoke("read-file","F:\\Scripts\\electron-vite-vue\\public\\example\\13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub");
+  const bookPath = await window.ipcRenderer.invoke("open-file-dialog");
+  if (!bookPath || !bookPath.endsWith(".epub")) {
+    console.log(123)
+    return;
+  }
+  const bookData = await window.ipcRenderer.invoke("read-file",bookPath);
   const book = Epub(bookData.buffer);
+  console.log(book)
   await book.ready
   // 提取封面
   const resources = book.resources;  
   const items = await resources.replacements()
-  const coverIndex = resources.urls.indexOf("Images/cover.jpg")
+  var coverIndex = resources.urls.indexOf("Images/cover.jpg")
+  if (coverIndex === -1) {
+    coverIndex = resources.urls.indexOf("Images/cover.jpeg")
+  }
   const coverURL = items[coverIndex]
   console.log(coverURL)
   const response = await fetch(coverURL);
   const coverBuffer = await response.arrayBuffer();
-  window.ipcRenderer.invoke("create-book","F:\\Scripts\\electron-vite-vue\\public\\example\\13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影.epub", coverBuffer);
+  window.ipcRenderer.invoke("create-book",bookPath , coverBuffer);
+  // 刷新页面
+  window.location.reload();
 };
 
 </script>

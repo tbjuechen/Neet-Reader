@@ -5,10 +5,13 @@ import path from 'node:path'
 import os from 'node:os'
 import { addBook, initUserDataPath, createCatalog, catalogColor, readCatalog, 
   catalog, updateCatalog, deleteCatalog, findCatalog, readBookInfo, readBook } from './store'
-import { readFile } from './file'
+import { readFile, openFileDialog } from './file'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+
+
 
 // The built directory structure
 //
@@ -41,14 +44,14 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0)
 }
 
-// 用户文件夹初始化检查
-initUserDataPath();
 
 let win: BrowserWindow | null = null
 const preload = path.join(__dirname, '../preload/index.mjs')
 const indexHtml = path.join(RENDERER_DIST, 'index.html')
 
 async function createWindow() {
+  // 用户文件夹初始化检查
+  await initUserDataPath()
   win = new BrowserWindow({
     title: 'Main window',
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
@@ -112,8 +115,8 @@ app.on('activate', () => {
 // New window example arg: new windows url
 ipcMain.handle('open-win', (_, arg) => {
   const childWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
     webPreferences: {
       preload: preload,
       nodeIntegration: true,
@@ -192,6 +195,10 @@ ipcMain.handle('get-cover', async (_, book_uuid: string):Promise<ArrayBuffer> =>
 
 ipcMain.handle('read-book', async (_, book_uuid: string):Promise<ArrayBuffer> => {
   return await readBook(book_uuid)
+})
+
+ipcMain.handle('open-file-dialog', (_) => {
+  return openFileDialog()
 })
 
 
