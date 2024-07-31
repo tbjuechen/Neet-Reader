@@ -46,8 +46,30 @@ const props = defineProps({
 // for frontend dev
 const data = ref({
   last_visit: null, // xx天前 xx小时前 null=新添加
-  cover: "/example/cover.jpg",
-  title: "13.[武田绫乃].吹响吧！上低音号：仰望你展翅飞翔的背影",
+  cover: null,
+  title: null,
+});
+
+// 时间转换器
+const timeParse = (time) => {
+  if (!time) return null;
+  const now = new Date();
+  const last = new Date(time);
+  const diff = now - last;
+  if (diff < 1000 * 60) return "刚刚";
+  if (diff < 1000 * 60 * 60) return `${Math.floor(diff / 1000 / 60)}分钟前`;
+  if (diff < 1000 * 60 * 60 * 24) return `${Math.floor(diff / 1000 / 60 / 60)}小时前`;
+  return `${Math.floor(diff / 1000 / 60 / 60 / 24)}天前`;
+};
+
+// 请求
+// data = await window.ipcRenderer.invoke("read-book-info", props.book_id);
+window.ipcRenderer.invoke("read-book-info", props.book_id).then(async (res) => {
+  var coverData = await window.ipcRenderer.invoke("get-cover", res.uuid);
+  const coverBlob = new Blob([coverData], { type: "image/jpeg" });
+  data.value.cover = URL.createObjectURL(coverBlob);
+  data.value.title = res.name;
+  data.value.last_visit = timeParse(res.last_visit);
 });
 
 // is checked

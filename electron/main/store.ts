@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 const APPDATA:string = process.env.APPDATA
 const USERDATAFILEPATH:string = path.join(APPDATA, 'NeetReader')
 const BOOKSPATH:string = path.join(USERDATAFILEPATH, 'books_store')
+process.env.BOOKSPATH = BOOKSPATH
 const SHELFPATH:string = path.join(USERDATAFILEPATH, 'shelf_store')
 const CATALOGPATH:string = path.join(SHELFPATH, 'catalog')
 
@@ -164,6 +165,14 @@ async function deleteCatalog(catalog_uuid:string):Promise<boolean>{
   }
 }
 
+// 读取书籍信息
+async function readBookInfo(book_uuid:string):Promise<book>{
+  const bookStorePath:string = path.join(BOOKSPATH, book_uuid)
+  const bookInfoPath:string = path.join(bookStorePath, 'info.json')
+  const bookInfo:book = JSON.parse(await fs.promises.readFile(bookInfoPath, 'utf-8'))
+  return bookInfo
+}
+
 export { initUserDataPath, createCatalog, addBook, 
   catalogColor, readCatalog, catalog, book, updateCatalog,
-  deleteCatalog }
+  deleteCatalog, findCatalog, readBookInfo }

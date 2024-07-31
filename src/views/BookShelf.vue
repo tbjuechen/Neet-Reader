@@ -40,8 +40,8 @@
     </div>
     <div class="book-grid-box">
       <BookCard
-        book_id="-1"
-        v-for="(item, key) in check_list"
+        v-for="(item, key) in bookList"
+        :book_id="item"
         :key="key"
         v-model="check_list[key]"
         :select_mode="select_mode"
@@ -64,22 +64,42 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import TBInput from "@/components/TBInput.vue";
 import DownArrowIcon from "@/assets/downArrow.svg";
 import BookCard from "@/components/BookCard.vue";
 import TBButton from "@/components/TBButton.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
 import TBDivider from "@/components/TBDivider.vue";
+import { useRoute } from "vue-router";
 
-// 从后端获取
+
+// 书架信息
+const route = useRoute();
+var currentCatalog;
+
 const data = ref({
-  name: "分类",
-  size: 16,
+  name: null,
+  size: null,
 });
 
-// for test
-const check_list = ref([false, false, false, false, false, false, false]);
+const bookList = ref([]);
+const check_list = ref([]);
+
+watch(()=>route.params.id, async (newVal, oldVal) => {
+  currentCatalog = await window.ipcRenderer.invoke("find-catalog", newVal);
+  data.value.name = currentCatalog.name;
+  data.value.size = currentCatalog.books.length;
+  bookList.value = [];
+  check_list.value = [];
+  currentCatalog.books.forEach(async (book) => {
+    bookList.value.push(book);
+    check_list.value.push(false);
+  });
+}, {immediate: true});
+// console.log(currentCatalogUUID.value);
+
+
 
 // const print = () => {
 //     console.log(check_list.value)

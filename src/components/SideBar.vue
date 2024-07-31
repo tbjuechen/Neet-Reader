@@ -12,7 +12,7 @@
       v-for="(item, key) in book_shelf_items"
       :key="item.name"
       :isSelect="item.isSelect"
-      :to="{ name: 'shelf', params: { id: key } }"
+      :to="{ name: 'shelf', params: { id: item.uuid } }"
       @click="handleSwich(item)"
     >
       <NoteIcon
