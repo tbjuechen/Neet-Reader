@@ -45,8 +45,31 @@
         :key="item.uuid"
         v-model="selectDist[item.uuid]"
         :select_mode="select_mode"
+        @contextmenu.prevent="(e) => {handleRightClick(e, item.uuid)}"
       ></BookCard>
     </div>
+    <TBFloatBox :style="style" v-if="displayRightClickMenu">
+      <div class="drop-box sort-table right-click-menu">
+        <div class="drop-box-item">
+          <p class="drop-box-text"> 打开 </p>
+        </div>
+        <div class="drop-box-item">
+          <p class="drop-box-text"> 添加至分类 </p>
+        </div>
+        <div class="drop-box-item">
+          <p class="drop-box-text"> 上传到云端 </p>
+        </div>
+        <div class="drop-box-item">
+          <p class="drop-box-text"> 导出文件 </p>
+        </div>
+        <div class="drop-box-item">
+          <p class="drop-box-text"> 导出笔记 </p>
+        </div>
+        <div class="drop-box-item">
+          <p class="drop-box-text"> 彻底删除 </p>
+        </div>
+      </div>
+    </TBFloatBox>
     <transition name="select-box">
       <div class="select-panel" v-if="select_mode">
         <input
@@ -89,6 +112,41 @@ const sortByName = ref(false);
 const bookList = ref([]);
 const displayBookList = ref([]);
 const selectDist = ref({});
+
+// 右击事件对象
+const focusedBook = ref()
+
+// 右击菜单位置
+const style = ref()
+
+// 显示右击菜单
+const displayRightClickMenu = ref(false)
+
+const closeRightClickMenu = () => {
+  displayRightClickMenu.value = false
+  window.removeEventListener('click', closeRightClickMenu)
+}
+
+const handleRightClick = (e, uuid) =>{
+  const pos_x = e.clientX
+  const pos_y = e.clientY
+  focusedBook.value = uuid
+  // 计算右键菜单出现位置
+  style.value = {'box-shadow': 'none'}
+  if (pos_y + 210 > window.innerHeight) {
+    style.value['bottom'] = 0;
+  } else {
+    style.value['top'] = pos_y + 'px';
+  }
+
+  if (pos_x + 144 > window.innerWidth) {
+    style.value['right'] = 0;
+  } else {
+    style.value['left'] = pos_x + 'px';
+  }
+  displayRightClickMenu.value = true
+  window.addEventListener('click', closeRightClickMenu)
+}
 
 watch(()=>route.params.id, async (newVal, oldVal) => {
   currentCatalog = await window.ipcRenderer.invoke("find-catalog", newVal);
@@ -395,6 +453,11 @@ p {
   position: absolute;
   right: 16px;
   color: rgb(24, 144, 255);
+}
+
+.right-click-menu{
+  width: 144px;
+  box-shadow: none;
 }
 
 </style>

@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { Teleport, defineProps } from "vue";
+import { Teleport, defineProps, computed } from "vue";
 
 const props = defineProps({
   top_pos: {
@@ -24,17 +24,19 @@ const props = defineProps({
   },
 });
 
-const style = props.style !== null? props.style :{
+const style = computed(()=>{ 
+  console.log(props.style)
+  return props.style !== null? props.style :{
   top: props.top_pos + "px",
   left: props.left_pos + "px",
-};
+}});
 
 // console.log(style)
 </script>
 
 <style scoped>
 .tb-float-box {
-  position: fixed;
+  position: absolute;
   z-index: 999;
   background-color: white;
   /* border: 1px solid #ccc; */
