@@ -43,7 +43,7 @@
         v-for="(item, key) in displayBookList"
         :book_id="item.uuid"
         :key="item.uuid"
-        v-model="item.isSelect"
+        v-model="selectDist[item.uuid]"
         :select_mode="select_mode"
       ></BookCard>
     </div>
@@ -88,6 +88,7 @@ const sortByName = ref(false);
 
 const bookList = ref([]);
 const displayBookList = ref([]);
+const selectDist = ref({});
 
 watch(()=>route.params.id, async (newVal, oldVal) => {
   currentCatalog = await window.ipcRenderer.invoke("find-catalog", newVal);
@@ -98,8 +99,8 @@ watch(()=>route.params.id, async (newVal, oldVal) => {
   await Promise.all(currentCatalog.books.map(async (book) => {
     const bookInfo = await window.ipcRenderer.invoke("read-book-info", book);
     bookList.value.push(bookInfo);
-    bookInfo.isSelect = false;
     displayBookList.value.push(bookInfo);
+    selectDist.value[bookInfo.uuid] = false;
   }));
   if (sortByName.value) {
     sortByNameFunc();
@@ -116,11 +117,10 @@ const sortByNameFunc = () => {
 
 const sortByTimeFunc = () => {
   console.log(displayBookList.value.sort((a, b) => {
-    // console.log(new Date(a.lastRead), new Date(b.lastRead));
     const aDate = new Date(a.lastRead);
     const bDate = new Date(b.lastRead);
     console.log(aDate, bDate);
-    return aDate - bDate;
+    return bDate - aDate;
   }));
   console.log(displayBookList.value);
 };
@@ -133,20 +133,24 @@ const sortByTimeFunc = () => {
 // print()
 
 const select_mode = computed(() => {
-  return displayBookList.value.some((item) => item.isSelect === true);
+  return Object.values(selectDist.value).some((item) => item === true);
 });
 
 const select_all = computed(() => {
-  return displayBookList.value.every((item) => item.isSelect === true);
+  return Object.values(selectDist.value).every((item) => item === true);
 });
 
 const select_text = ref("");
 
 const handleSelectChange = (e) => {
   if (e.target.checked) {
-    displayBookList.value.forEach((item, index, arr) => (arr[index].isSelect = true));
+    Object.getOwnPropertyNames(selectDist.value).forEach(key => {
+      selectDist.value[key] = true
+    });
   } else {
-    displayBookList.value.forEach((item, index, arr) => (arr[index].isSelect = false));
+    Object.getOwnPropertyNames(selectDist.value).forEach(key => {
+      selectDist.value[key] = false
+    });
   }
 };
 
@@ -157,7 +161,10 @@ const handleInputSelectText = (e) => {
   timeoutId.value = setTimeout(() => {
     console.log(select_text.value);
     // filter 逻辑
-  }, 1000);
+    displayBookList.value = bookList.value.filter((item) => {
+      return item.name.includes(select_text.value);
+    });
+  }, 500);
 };
 
 const displaySoetTable = ref(false);

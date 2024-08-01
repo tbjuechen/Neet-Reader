@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
 import { addBook, initUserDataPath, createCatalog, catalogColor, readCatalog, 
-  catalog, updateCatalog, deleteCatalog, findCatalog, readBookInfo, readBook } from './store'
+  catalog, updateCatalog, deleteCatalog, findCatalog, readBookInfo, readBook,
+  deleteBook } from './store'
 import { readFile, openFileDialog } from './file'
 
 const require = createRequire(import.meta.url)
@@ -201,5 +202,6 @@ ipcMain.handle('open-file-dialog', (_) => {
   return openFileDialog()
 })
 
-
-
+ipcMain.handle('delete-book', async (_,book_id:string) =>{
+  return await deleteBook(book_id)
+})

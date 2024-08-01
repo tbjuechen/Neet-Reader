@@ -184,6 +184,20 @@ async function readBook(book_uuid:string):Promise<ArrayBuffer>{
   return data
 }
 
+// 删除书籍
+async function deleteBook(book_uuid:string):Promise<boolean> {
+  // 从各分类删除书籍
+  var catalogList:Array<catalog> = await readCatalog()
+  catalogList.forEach((_, index, arr) => {
+    arr[index].books = arr[index].books.filter(item => {return item !== book_uuid})
+  })
+  await writeCatalog(catalogList)
+  // 删除书籍文件
+  const bookStorePath:string = path.join(BOOKSPATH, book_uuid)
+  await fs.promises.rm(bookStorePath,{recursive: true, force: true})
+  return true
+}
+
 export { initUserDataPath, createCatalog, addBook, 
   catalogColor, readCatalog, catalog, book, updateCatalog,
-  deleteCatalog, findCatalog, readBookInfo, readBook }
+  deleteCatalog, findCatalog, readBookInfo, readBook, deleteBook }

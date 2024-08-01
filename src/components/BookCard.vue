@@ -17,7 +17,7 @@
         @input="$emit('update:modelValue', $event.target.checked)"
         @click.stop
       />
-      <div class="cloud-save" @click.stop>
+      <div class="cloud-save" @click.stop @click="handleClickCloud">
         <div class="dot" id="cloud-save-background">
           <CloudIcon width="20" height="20" style="margin-left: 0.67px" />
         </div>
@@ -80,6 +80,11 @@ const isChecked = ref(false);
 
 const handleClickBook = () =>{
   window.ipcRenderer.invoke("open-win",props.book_id)
+}
+
+// dev
+const handleClickCloud = () =>{
+  // window.ipcRenderer.invoke('delete-book', props.book_id)
 }
 
 </script>
