@@ -1,13 +1,13 @@
 <template>
   <Teleport to="body">
-    <div class="tb-float-box" :style="style">
+    <div :class="{'tb-float-box':true, 'act': animation, 'quit': animation && isQuit }" :style="style">
       <slot></slot>
     </div>
   </Teleport>
 </template>
 
 <script setup>
-import { Teleport, defineProps, computed } from "vue";
+import { Teleport, defineProps, computed, onBeforeUnmount, ref } from "vue";
 
 const props = defineProps({
   top_pos: {
@@ -22,10 +22,19 @@ const props = defineProps({
     type: Object,
     default: () => (null),
   },
+  animation:{
+    type: Boolean,
+    default: ()=> false,
+  }
 });
 
+const isQuit = ref(false)
+
+onBeforeUnmount(()=>{
+  isQuit.value = true
+})
+
 const style = computed(()=>{ 
-  console.log(props.style)
   return props.style !== null? props.style :{
   top: props.top_pos + "px",
   left: props.left_pos + "px",
@@ -43,5 +52,31 @@ const style = computed(()=>{
   z-index: 1000;
   border-radius: 4px;
   box-shadow: 0 0 50px -10px rgb(204, 204, 204);
+}
+
+.act{
+  animation: enter 0.2s forwards;
+}
+
+@keyframes enter{
+  from {
+    transform: scaleY(0.5) translate(0, -50%);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.quit{
+  animation: leave 0.2s forwards;
+}
+
+@keyframes leave {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scaleY(0.5) translate(0, -50%);
+  }
 }
 </style>

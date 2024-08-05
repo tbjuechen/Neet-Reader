@@ -5,7 +5,7 @@ import path from 'node:path'
 import os from 'node:os'
 import { addBook, initUserDataPath, createCatalog, catalogColor, readCatalog, 
   catalog, updateCatalog, deleteCatalog, findCatalog, readBookInfo, readBook,
-  deleteBook } from './store'
+  deleteBook, add2Catalog } from './store'
 import { readFile, openFileDialog } from './file'
 
 const require = createRequire(import.meta.url)
@@ -204,4 +204,8 @@ ipcMain.handle('open-file-dialog', (_) => {
 
 ipcMain.handle('delete-book', async (_,book_id:string) =>{
   return await deleteBook(book_id)
+})
+
+ipcMain.handle('add-to-catalog', async (_, book_uuid:string, catalog_uuid:string) => {
+  await add2Catalog(book_uuid, catalog_uuid)
 })

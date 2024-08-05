@@ -9,6 +9,7 @@
         <WarningIcon id="message-icon" />
         <p id="message-text">{{ props.message }}</p>
       </span>
+      <p id="message-text" v-if="props.content">{{ props.content }}</p>
       <div class="botton-box">
         <TBButton :style="button_style" id="reject" @click="handleReject"
           >取&ensp;消</TBButton
@@ -55,6 +56,10 @@ const props = defineProps({
     type: String,
     default: () => "0",
   },
+  content: {
+    type: String,
+    default: () => null
+  }
 });
 
 const button_style = {

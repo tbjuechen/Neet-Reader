@@ -61,11 +61,11 @@
     <TBDivider class="divider" direction="horizontal" style="width: 176px" />
   </div>
   <component
-    v-if="item_menu_display"
     :is="item_menu_cpt"
     v-bind="item_menu_props"
+    v-if="item_menu_display"
   >
-    <div class="drop-box">
+    <div class="drop-box act" v-if="item_menu_display">
       <div class="drop-box-item" @click="handleClickEdit">
         <p class="drop-box-text">编辑</p>
       </div>
@@ -194,6 +194,7 @@ const item_menu_cpt = ref(null);
 const item_menu_props = ref({
   top_pos: 0,
   left_pos: 0,
+  animation: true
 });
 const item_menu_display = ref(false);
 let last_click_item = null;
@@ -488,4 +489,15 @@ h4 {
 #confirm-button > p {
   margin: 0;
 }
+
+/* .sideBar-drop-box-enter-active,
+.sideBar-drop-box-leave-active{
+  transition: all 0.2s;
+}
+
+.sideBar-drop-box-enter-from,
+.sideBar-drop-box-leave-to{
+  transform: translate(100px,0);
+} */
+
 </style>

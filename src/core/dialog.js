@@ -1,7 +1,7 @@
 import TBDialog from "@/components/TBDialog.vue";
 import { createApp, h } from 'vue';
 
-export default function openDialog(message, reject_fun, accept_fun, x=0, y=0){
+export default function openDialog(message, reject_fun, accept_fun, x=0, y=0, content=null){
     const placeholder = document.createElement('div');
     document.body.appendChild(placeholder);
     

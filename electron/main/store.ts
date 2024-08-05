@@ -200,4 +200,5 @@ async function deleteBook(book_uuid:string):Promise<boolean> {
 
 export { initUserDataPath, createCatalog, addBook, 
   catalogColor, readCatalog, catalog, book, updateCatalog,
-  deleteCatalog, findCatalog, readBookInfo, readBook, deleteBook }
+  deleteCatalog, findCatalog, readBookInfo, readBook, deleteBook,
+  add2Catalog }

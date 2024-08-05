@@ -50,11 +50,17 @@
     </div>
     <TBFloatBox :style="style" v-if="displayRightClickMenu">
       <div class="drop-box sort-table right-click-menu">
-        <div class="drop-box-item">
+        <div class="drop-box-item" @click="handelOpenBook">
           <p class="drop-box-text"> 打开 </p>
         </div>
-        <div class="drop-box-item">
+        <div class="drop-box-item sub-item-wrapper">
           <p class="drop-box-text"> 添加至分类 </p>
+          <div class="drop-box sort-table sub-item">
+            <div class="drop-box-item" v-for="item in catalogList" :key="item.uuid" style="width:100%" 
+              @click="handleAddCatalog(item.uuid)">
+              <p class="drop-box-text">{{ item.name }}</p>
+            </div>
+          </div>
         </div>
         <div class="drop-box-item">
           <p class="drop-box-text"> 上传到云端 </p>
@@ -65,8 +71,8 @@
         <div class="drop-box-item">
           <p class="drop-box-text"> 导出笔记 </p>
         </div>
-        <div class="drop-box-item">
-          <p class="drop-box-text"> 彻底删除 </p>
+        <div class="drop-box-item" @click="handleDeleteBook">
+          <p class="drop-box-text red-text"> 彻底删除 </p>
         </div>
       </div>
     </TBFloatBox>
@@ -95,6 +101,7 @@ import TBButton from "@/components/TBButton.vue";
 import TBFloatBox from "@/components/TBFloatBox.vue";
 import TBDivider from "@/components/TBDivider.vue";
 import { useRoute } from "vue-router";
+import openDialog from "@/core/dialog.js";
 
 
 // 书架信息
@@ -127,9 +134,21 @@ const closeRightClickMenu = () => {
   window.removeEventListener('click', closeRightClickMenu)
 }
 
+// 当前书架信息
+const catalogList = ref()
+
+// 同步书架
+const loadCatalog = () => {
+  window.ipcRenderer.invoke("get-catalog-list").then((res) => {
+  catalogList.value = res.filter(item => item.uuid !== 'default')
+});
+}
+
+// 处理右击事件
 const handleRightClick = (e, uuid) =>{
   const pos_x = e.clientX
   const pos_y = e.clientY
+  loadCatalog()
   focusedBook.value = uuid
   // 计算右键菜单出现位置
   style.value = {'box-shadow': 'none'}
@@ -146,6 +165,32 @@ const handleRightClick = (e, uuid) =>{
   }
   displayRightClickMenu.value = true
   window.addEventListener('click', closeRightClickMenu)
+}
+
+// 打开
+const handelOpenBook = () => {
+  window.ipcRenderer.invoke("open-win",focusedBook.value)
+}
+
+// 添加至分类
+const handleAddCatalog = (catalog_id) => {
+  window.ipcRenderer.invoke('add-to-catalog', focusedBook.value, catalog_id)
+}
+
+// 删除
+const handleDeleteBook = (e) => {
+  const message = '是否彻底删除该图书'
+  const content = '该操作会删除该书在本地所有数据'
+  const x = e.clientX.toString() + "px";
+  const y = e.clientY.toString() + "px";
+  const accept = () => {
+    window.ipcRenderer.invoke('delete-book',focusedBook.value).then((res)=>{
+      console.log(res)
+    })
+    window.location.reload() // 重新加载页面
+  }
+  const reject = () => {}
+  openDialog(message, reject, accept, x, y, content)
 }
 
 watch(()=>route.params.id, async (newVal, oldVal) => {
@@ -460,4 +505,33 @@ p {
   box-shadow: none;
 }
 
+.sub-item-wrapper{
+  position: relative;
+}
+
+.sub-item-wrapper::after{
+  position: absolute;
+  content: '▶';
+  left: calc(100% - 20px);
+  color: rgb(201,201,201);
+  font-size: 10px;
+}
+
+.sub-item{
+  position:absolute;
+  width: 100px;
+  left: 100%;
+  z-index: 10;
+  background-color: white;
+  box-shadow: 0 0 5px -2px rgb(88,88,88);
+  opacity: 0;
+}
+
+.sub-item-wrapper:hover .sub-item{
+  opacity: 1;
+}
+
+.red-text{
+  color: rgb(255,100,109)
+}
 </style>
