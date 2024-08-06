@@ -408,7 +408,7 @@ const handleClick = () => {
 // 将书本挂载到 read 上
 const initRendition = (leftBar=true) => {
   rendition = book.renderTo("read",{
-    width: (window.innerWidth- (leftBar?470:170)).toString() + "px",
+    width: (window.innerWidth- (leftBar?390:90)).toString() + "px",
     // width: "500px",
     height: (window.innerHeight-90).toString() + "px",
   })
@@ -725,7 +725,7 @@ const processBarPos = computed(()=>{
 
 .turn-page{
  height: 100vh;
- width: 80px; 
+ width: 40px; 
  position: relative;
  cursor: pointer;
 }
@@ -733,7 +733,7 @@ const processBarPos = computed(()=>{
 .turn-page::after{
   position: absolute;
   bottom: 300px;
-  left: 20px;
+  /* left: 10px; */
   font-size: 40px;
   font-weight: 800;
   transform: scale(1, 2);

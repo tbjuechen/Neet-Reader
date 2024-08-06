@@ -1,6 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import { v4 as uuidv4 } from 'uuid'
+import { preProcessFile } from 'typescript'
 
 const APPDATA:string = process.env.APPDATA
 const USERDATAFILEPATH:string = path.join(APPDATA, 'NeetReader')
@@ -21,7 +22,8 @@ interface catalog{
 interface book {
   uuid: string,
   name: string,
-  lastRead: null | Date
+  lastRead: null | Date,
+  readProcess: string
 }
 
 async function initUserDataPath():Promise<void>{
@@ -127,7 +129,8 @@ async function addBook(book_path:string, cover:ArrayBuffer, catalog_uuid:string=
   const bookInfo:book = {
     uuid: book_uuid,
     name: title,
-    lastRead: null
+    lastRead: null,
+    readProcess: null
   }
   // 创建书籍文件夹
   const bookStorePath:string = path.join(BOOKSPATH, book_uuid)
@@ -198,7 +201,14 @@ async function deleteBook(book_uuid:string):Promise<boolean> {
   return true
 }
 
+async function updateProcess(book_uuid:string, process:string) {
+  var bookInfo = await readBookInfo(book_uuid)
+  bookInfo.readProcess = process
+  const bookStorePath:string = path.join(BOOKSPATH, book_uuid)
+  await fs.promises.writeFile(path.join(bookStorePath, 'info.json'), JSON.stringify(bookInfo), 'utf-8')
+}
+
 export { initUserDataPath, createCatalog, addBook, 
   catalogColor, readCatalog, catalog, book, updateCatalog,
   deleteCatalog, findCatalog, readBookInfo, readBook, deleteBook,
-  add2Catalog }
+  add2Catalog, updateProcess }

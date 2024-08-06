@@ -71,7 +71,7 @@ window.ipcRenderer.invoke("read-book-info", props.book_id).then(async (res) => {
   const coverBlob = new Blob([coverData], { type: "image/jpeg" });
   data.value.cover = URL.createObjectURL(coverBlob);
   data.value.title = res.name;
-  console.log(res.lastRead);
+  // console.log(res.lastRead);
   data.value.last_visit = timeParse(res.lastRead);
 });
 
