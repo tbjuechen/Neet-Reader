@@ -1,6 +1,6 @@
 {
   "name": "NeetReader",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist-electron/main/index.js",
   "description": "EpubReader",
   "author": "tbjuechen <1324374092@qq.com>",
