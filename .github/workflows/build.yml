@@ -2,17 +2,17 @@ name: Build
 
 on:
   push:
-    # branches: [main]
-    # paths-ignore:
-    #   - "**.md"
-    #   - "**.spec.js"
-    #   - ".idea"
-    #   - ".vscode"
-    #   - ".dockerignore"
-    #   - "Dockerfile"
-    #   - ".gitignore"
-    #   - ".github/**"
-    #   - "!.github/workflows/build.yml"
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "**.spec.js"
+      - ".idea"
+      - ".vscode"
+      - ".dockerignore"
+      - "Dockerfile"
+      - ".gitignore"
+      - ".github/**"
+      - "!.github/workflows/build.yml"
     tags: 
       - '*'
 
@@ -51,25 +51,3 @@ jobs:
       - name: Package project
         run: tar -czvf my-package.tar.gz ./dist
       
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Release for tag ${{ github.ref }}.
-          draft: false
-          prerelease: false
-  
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: release/
-          asset_name: release_on_${{ matrix. os }}
-          asset_content_type: application/octet-stream
