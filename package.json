@@ -1,6 +1,6 @@
 {
   "name": "NeetReader",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "dist-electron/main/index.js",
   "description": "EpubReader",
   "author": "tbjuechen <1324374092@qq.com>",
@@ -21,7 +21,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "chcp 65001 && vue-tsc --noEmit && vite build && electron-builder",
+    "build": "vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview"
   },
   "devDependencies": {
