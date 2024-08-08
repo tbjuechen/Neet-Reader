@@ -66,8 +66,10 @@ jobs:
   
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./my-package.tar.gz
-          asset_name: my-package.tar.gz
-          asset_content_type: application/gzip
+          asset_path: ./release/*
+          asset_name: ''
+          asset_content_type: application/octet-stream
