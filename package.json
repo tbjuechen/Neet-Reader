@@ -1,9 +1,9 @@
 {
-  "name": "electron-vue-vite",
-  "version": "28.1.0",
+  "name": "NeetReader",
+  "version": "0.0.1",
   "main": "dist-electron/main/index.js",
-  "description": "Really simple Electron + Vue + Vite boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "description": "EpubReader",
+  "author": "tbjuechen <1324374092@qq.com>",
   "license": "MIT",
   "private": true,
   "keywords": [
@@ -21,7 +21,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build": "chcp 65001 && vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview"
   },
   "devDependencies": {

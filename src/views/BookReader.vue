@@ -327,6 +327,11 @@ const formatProcess = (process) =>{
 
 const PageList = ref([])
 
+// 加载书本基本信息
+window.ipcRenderer.invoke('read-book-info', route.params.id).then((res)=>{
+  document.title = res.name
+})
+
 // 加载书本
 window.ipcRenderer.invoke('read-book', route.params.id).then((res)=>{
   book = new Epub(res.buffer)

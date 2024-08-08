@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, session } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -10,7 +10,6 @@ import { readFile, openFileDialog } from './file'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
 
 
 
@@ -54,7 +53,7 @@ async function createWindow() {
   // 用户文件夹初始化检查
   await initUserDataPath()
   win = new BrowserWindow({
-    title: 'Main window',
+    title: 'Neet Reader',
     icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
     frame: false,
     webPreferences: {
@@ -76,6 +75,7 @@ async function createWindow() {
     win.loadFile(indexHtml)
   }
 
+  // win.webContents.session.loadExtension('F:\\Download\\QQDownload\\nhdogjmejiglipccpnnnanhbledajbpd_6.6.1')
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
@@ -89,7 +89,10 @@ async function createWindow() {
   // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(async ()=>{
+  // await session.defaultSession.loadExtension('F:\\Download\\QQDownload\\nhdogjmejiglipccpnnnanhbledajbpd_6.6.1')
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   win = null
@@ -114,8 +117,10 @@ app.on('activate', () => {
 })
 
 // New window example arg: new windows url
-ipcMain.handle('open-win', (_, arg) => {
+ipcMain.handle('open-win', async (_, arg) => {
+  const bookInfo = await readBookInfo(arg)
   const childWindow = new BrowserWindow({
+    title: bookInfo.name,
     width: 1200,
     height: 800,
     webPreferences: {
@@ -126,13 +131,13 @@ ipcMain.handle('open-win', (_, arg) => {
   })
 
   childWindow.setMenu(null);
-  childWindow.webContents.openDevTools();
+  // childWindow.webContents.openDevTools();
 
   if (VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${VITE_DEV_SERVER_URL}book/${arg}`)
+    childWindow.loadURL(`${VITE_DEV_SERVER_URL}#/book/${arg}`)
     // childWindow.loadURL(`http://8.130.141.36:1234/`)
   } else {
-    childWindow.loadFile(indexHtml, { hash: arg })
+    childWindow.loadFile(indexHtml, { hash: `/book/${arg}` })
   }
 })
 
