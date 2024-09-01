@@ -29,7 +29,7 @@
     "@types/vue": "^2.0.0",
     "@types/vue-router": "^2.0.0",
     "@vitejs/plugin-vue": "^5.0.4",
-    "electron": "^29.1.1",
+    "electron": "^32.0.1",
     "electron-builder": "^24.13.3",
     "typescript": "^5.5.2",
     "vite": "^5.1.5",
